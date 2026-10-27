@@ -35,26 +35,30 @@
 
     <!-- Main Container -->
     <div class="max-w-md mx-auto p-4 sm:p-6 my-6 bg-white rounded-2xl shadow-lg border border-gray-200">
+        <!-- Home Button links oben & User-Anzeige rechts -->
         <div class="flex justify-between items-center mb-1">
-            <h1 class="text-xl font-bold text-teal-900 cursor-pointer" onclick="goToDashboard()">✈️ Syouf und Fubes</h1>
-            <button onclick="openUserModalManual()" class="text-xs bg-teal-50 text-teal-900 px-2.5 py-1 rounded-full font-medium border border-teal-200">👤 <span id="currentUserDisplay">Wählen...</span></button>
+            <button onclick="goToDashboard()" class="text-base font-bold text-teal-900 hover:text-teal-700 flex items-center gap-1.5 text-left bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 shadow-sm">
+                🏠 <span class="truncate">Home</span>
+            </button>
+            <button onclick="openUserModalManual()" class="text-xs bg-teal-50 text-teal-900 px-2.5 py-1.5 rounded-full font-medium border border-teal-200 shrink-0">👤 <span id="currentUserDisplay">Wählen...</span></button>
         </div>
         <p class="text-xs text-center text-gray-500 mb-4 font-medium" id="currentYearDisplay">Live-Sync</p>
         <div id="syncStatus" class="text-center text-xs text-teal-700 mb-4 font-medium">Verbinde...</div>
 
         <!-- Dashboard View -->
         <div id="viewDashboard" class="space-y-4">
+            <!-- Mitglieder & PayPal -->
             <div class="p-4 bg-gray-50 rounded-xl border">
                 <h2 class="text-xs font-bold text-gray-700 uppercase mb-2">👥 Mitglieder & PayPal</h2>
-                <div class="flex gap-2 mb-2">
-                    <input type="text" id="globalMemberName" placeholder="Name..." class="flex-1 px-3 py-1.5 text-xs border rounded-lg">
-                    <input type="text" id="globalMemberPaypal" placeholder="PayPal (optional)" class="w-28 px-3 py-1.5 text-xs border rounded-lg">
-                    <button onclick="addGlobalMember()" class="bg-teal-700 text-white px-3 py-1.5 text-xs rounded-lg">Hinzufügen</button>
+                <div class="space-y-2 mb-3">
+                    <input type="text" id="globalMemberName" placeholder="Name..." class="w-full px-3 py-2 text-xs border rounded-lg">
+                    <input type="text" id="globalMemberPaypal" placeholder="PayPal.me Name (optional)" class="w-full px-3 py-2 text-xs border rounded-lg">
+                    <button onclick="addGlobalMember()" class="w-full bg-teal-700 text-white py-2 text-xs font-bold rounded-lg">Hinzufügen</button>
                 </div>
                 <div id="globalMemberList" class="flex flex-wrap gap-1.5"></div>
             </div>
 
-            <!-- Optionen zum Trip anlegen: Zufallsgenerator & Manueller Button -->
+            <!-- Optionen zum Trip anlegen -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="p-4 bg-teal-900 text-white rounded-xl flex flex-col justify-between">
                     <div>
@@ -98,8 +102,17 @@
         <div id="viewTripDashboard" class="space-y-4 hidden">
             <div id="tripHeaderBox" class="flex justify-between items-center bg-teal-900 text-white p-3 rounded-xl">
                 <div><span id="tripHeaderSub" class="text-[10px] uppercase text-teal-300">Zentrale</span><h2 id="tripDashboardTitle" class="text-sm font-bold">Trip</h2></div>
-                <button onclick="goToDashboard()" class="bg-teal-700 px-3 py-1 text-xs rounded-lg">🏠 Home</button>
             </div>
+            
+            <!-- Mitglieder in der Reisezentrale verwalten / hinzufügen -->
+            <div class="p-4 bg-teal-50/50 rounded-xl border">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-xs font-bold text-teal-900 uppercase">👥 Teilnehmer im Trip</h2>
+                    <button onclick="addMemberToCurrentTripPrompt()" class="text-[10px] bg-teal-700 text-white px-2.5 py-1 rounded font-bold shadow">+ Hinzufügen</button>
+                </div>
+                <div id="tripDashboardMemberList" class="flex flex-wrap gap-1.5"></div>
+            </div>
+
             <div class="flex border-b mb-2 bg-gray-50 p-1 rounded-xl">
                 <button onclick="switchTripTab('info')" id="tripTabBtn-info" class="flex-1 pb-2 pt-1 text-xs font-bold text-teal-900 border-b-2 border-teal-800">📋 Infos</button>
                 <button onclick="switchTripTab('photos')" id="tripTabBtn-photos" class="flex-1 pb-2 pt-1 text-xs font-bold text-gray-500 border-b-2 border-transparent">📸 Fotos</button>
@@ -126,10 +139,19 @@
         <div id="viewSplitMoney" class="space-y-4 hidden">
             <div id="moneyHeaderBox" class="flex justify-between items-center bg-teal-900 text-white p-3 rounded-xl">
                 <div><span id="moneyHeaderSub" class="text-[10px] uppercase text-teal-300">Kasse</span><h2 id="activeTripTitle" class="text-sm font-bold">Rubrik</h2></div>
-                <div class="flex gap-2"><button onclick="openTripDashboard(curEvent)" class="bg-teal-700 px-3 py-1 text-xs rounded">🔙 Info</button><button onclick="goToDashboard()" class="bg-teal-950 px-2 py-1 text-xs rounded">🏠</button></div>
+                <!-- Nur noch der "Zur Info"-Button da, wo vorher Home war -->
+                <button onclick="openTripDashboard(curEvent)" class="bg-teal-700 px-3 py-1.5 text-xs font-bold rounded-lg shadow">🔙 Zur Info</button>
             </div>
-            <button onclick="shareLink()" class="w-full bg-teal-800 text-white py-2 text-xs rounded shadow">🔗 Link kopieren</button>
-            <div class="p-4 bg-teal-50/50 rounded-xl border"><div class="flex justify-between items-center mb-2"><h2 class="text-sm font-semibold">1. Teilnehmer</h2><button id="toggleReadyBtn" onclick="toggleReady()" class="hidden text-xs px-3 py-1 rounded font-semibold bg-teal-700 text-white">⏳ Fertig ✓</button></div><div id="memberList" class="space-y-2"></div></div>
+            
+            <!-- Teilnehmer-Sektion -->
+            <div class="p-4 bg-teal-50/50 rounded-xl border">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-semibold">1. Teilnehmer</h2>
+                    <button id="toggleReadyBtn" onclick="toggleReady()" class="hidden text-xs px-3 py-1 rounded font-semibold bg-teal-700 text-white">⏳ Fertig ✓</button>
+                </div>
+                <div id="memberList" class="space-y-2"></div>
+            </div>
+
             <div class="flex border-b mb-2">
                 <button onclick="switchTab('mine')" id="tabBtn-mine" class="flex-1 pb-2 text-xs font-bold text-teal-900 border-b-2 border-teal-800">💸 Meine</button>
                 <button onclick="switchTab('all')" id="tabBtn-all" class="flex-1 pb-2 text-xs font-bold text-gray-500 border-b-2 border-transparent">📋 Alle</button>
@@ -186,8 +208,24 @@
                 else { await sb.from('split_data').upsert({ id: 'main_store', data: appData }); }
                 document.getElementById('syncStatus').innerText = "⚡ Live-Sync aktiv"; document.getElementById('syncStatus').className = "text-center text-xs text-emerald-600 mb-4 font-medium";
             } catch (e) { document.getElementById('syncStatus').innerText = "⚠️ Offline"; }
+            
+            let urlParams = new URLSearchParams(window.location.search);
+            let ev = urlParams.get('event');
+            if (ev) {
+                curEvent = ev;
+                viewMode = 'dashboard';
+            }
+
             renderUI();
-            sb.channel('public:split_data').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'split_data', filter: 'id=eq.main_store' }, p => { if (p.new?.data) { appData = p.new.data; renderUI(); } }).subscribe();
+
+            sb.channel('public:split_data').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'split_data', filter: 'id=eq.main_store' }, p => {
+                if (p.new?.data) {
+                    let activeEl = document.activeElement;
+                    let isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
+                    appData = p.new.data;
+                    if (!isTyping) { renderUI(); }
+                }
+            }).subscribe();
         }
 
         async function save() { await sb.from('split_data').upsert({ id: 'main_store', data: appData }); }
@@ -200,7 +238,6 @@
 
         function switchTripTab(t) { ['info', 'photos'].forEach(x => { document.getElementById(`tripTabContent-${x}`).classList.toggle('hidden', x !== t); document.getElementById(`tripTabBtn-${x}`).className = `flex-1 pb-2 pt-1 text-xs font-bold ${x === t ? 'text-teal-900 border-b-2 border-teal-800' : 'text-gray-500 border-b-2 border-transparent'}`; }); }
         function switchTab(t) { ['mine', 'all', 'settlement'].forEach(x => { document.getElementById(`tabContent-${x}`).classList.toggle('hidden', x !== t); document.getElementById(`tabBtn-${x}`).className = `flex-1 pb-2 text-xs font-bold ${x === t ? 'text-teal-900 border-b-2 border-teal-800' : 'text-gray-500 border-b-2 border-transparent'}`; }); }
-        function shareLink() { navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?event=${encodeURIComponent(curEvent)}&view=${viewMode}`).then(() => alert('🔗 Link kopiert!')); }
 
         async function addGlobalMember() {
             let n = document.getElementById('globalMemberName').value.trim(); if (!n) return;
@@ -211,6 +248,30 @@
             document.getElementById('globalMemberPaypal').value = '';
             for (let ev in appData) { if (ev !== 'meta') { if (!appData[ev].members) appData[ev].members = {}; if (!appData[ev].members[n]) appData[ev].members[n] = { ready: false, active: true, paypal: pp }; } }
             if (!activeUser) selectUser(n); await save(); renderUI();
+        }
+
+        async function addMemberToCurrentTripPrompt() {
+            let name = prompt("Name des neuen Mitreisenden:");
+            if (!name || !name.trim()) return;
+            let n = name.trim();
+            
+            if (!appData.meta.globalMembers) appData.meta.globalMembers = {};
+            if (!appData.meta.globalMembers[n]) {
+                appData.meta.globalMembers[n] = { paypal: '' };
+            }
+
+            for (let ev in appData) {
+                if (ev !== 'meta') {
+                    if (!appData[ev].members) appData[ev].members = {};
+                    if (!appData[ev].members[n]) {
+                        appData[ev].members[n] = { ready: false, active: true, paypal: '' };
+                    }
+                }
+            }
+
+            await save();
+            renderUI();
+            alert(`✅ ${n} wurde zum Trip hinzugefügt!`);
         }
 
         async function deleteGlobalMember(n) {
@@ -258,7 +319,6 @@
             await save(); toggleModal('lotteryModal', false); openTripDashboard(auto); alert(`🎉 ${w} plant!`);
         }
 
-        // Manuelles Anlegen eines Trips über das Pop-up
         function openManualTripModal() {
             document.getElementById('manualTripNameInput').value = '';
             toggleModal('manualTripModal', true);
@@ -396,12 +456,12 @@
         }
 
         async function settleDebt(from, to, amount, allowed, paypal) {
-            if (!allowed) return alert("🔒 Warten!");
-            if (paypal && confirm(`PayPal an ${to}?`)) window.open(`https://${paypal.replace(/^https?:\/\//i, '')}/${amount.toFixed(2)}EUR`, '_blank');
-            if (confirm('Ausgleich verbuchen?')) {
+            if (!allowed) return alert("🔒 Warten bis alle Mitglieder auf 'Fertig' geklickt haben!");
+            if (paypal && confirm(`PayPal an ${to} öffnen?`)) window.open(`https://${paypal.replace(/^https?:\/\//i, '')}/${amount.toFixed(2)}EUR`, '_blank');
+            if (confirm(`Ausgleich von ${from} an ${to} verbuchen?`)) {
                 appData[curEvent].expenses.push({ desc: `💸 Ausgleich: ${from} an ${to}`, amount, payer: from, participants: [to], createdBy: activeUser });
                 let d = appData[curEvent], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false);
-                if (isArchived(d, ae)) { d.images = []; alert('🎉 Archiviert!'); }
+                if (isArchived(d, ae)) { d.images = []; alert('🎉 Alle Rechnungen beglichen! Der Trip ist nun im Archiv beendet.'); }
                 await save(); renderUI();
             }
         }
@@ -443,7 +503,7 @@
 
                 let headerClass = arch ? "flex justify-between items-center bg-gray-700 text-white p-3 rounded-xl" : "flex justify-between items-center bg-teal-900 text-white p-3 rounded-xl";
                 document.getElementById('tripHeaderBox').className = headerClass;
-                document.getElementById('tripHeaderSub').innerText = arch ? "Archiv" : "Reisezentrale";
+                document.getElementById('tripHeaderSub').innerText = arch ? "Archiv (Beendet)" : "Reisezentrale";
                 document.getElementById('moneyHeaderBox').className = headerClass;
                 document.getElementById('moneyHeaderSub').innerText = arch ? "Kasse (Archiv)" : "Kasse";
 
@@ -455,6 +515,8 @@
                     document.getElementById('tripDashboardPlanner').innerHTML = `Planer: <span style="color:${getUsernameColor(d.planner)};font-weight:bold">${d.planner || 'Offen'}</span>`;
                     document.getElementById('tripDashboardDates').innerText = d.pollDates ? `📅 ${d.pollDates}` : "Termin offen";
                     document.getElementById('tripDashboardInfos').innerHTML = d.infos ? d.infos.replace(/\n/g, '<br>') : 'Keine Infos.';
+
+                    document.getElementById('tripDashboardMemberList').innerHTML = ents.length === 0 ? '<span class="text-[11px] text-gray-400 italic">Keine Mitglieder.</span>' : ents.map(([name, m]) => `<button onclick="toggleMemberActive('${name}')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold border ${m.active !== false ? 'bg-white text-teal-900 border-teal-200' : 'bg-gray-100 text-gray-400 line-through border-gray-300'}" style="${m.active !== false ? 'color:' + getUsernameColor(name) : ''}">${m.active !== false ? '✅' : '❌'} ${name}</button>`).join('');
 
                     let ic = document.getElementById('tripImageContainer'), idisp = document.getElementById('tripImageDisplay'), noim = document.getElementById('noImagesText');
                     if (d.images?.length > 0) { idisp.innerHTML = d.images.map(img => `<div class="relative"><img src="${img.url}" class="w-full h-28 object-cover rounded border"><span class="absolute bottom-1 left-1 bg-black/70 text-[9px] px-1 rounded font-bold" style="color:${getUsernameColor(img.by)}">${img.by}</span></div>`).join(''); ic.classList.remove('hidden'); noim.classList.add('hidden'); } else { ic.classList.add('hidden'); noim.classList.remove('hidden'); }
@@ -479,9 +541,9 @@
                     document.getElementById('viewTripDashboard').classList.add('hidden');
                     document.getElementById('viewSplitMoney').classList.remove('hidden');
                     document.getElementById('activeTripTitle').innerText = curEvent;
-                    document.getElementById('settlementInfoText').innerText = arch ? "🔒 Archiviert!" : (allR ? "✨ Abrechnung frei!" : "Warten...");
+                    document.getElementById('settlementInfoText').innerText = arch ? "🔒 Alle Rechnungen beglichen – Trip im Archiv!" : (allR ? "✨ Abrechnung frei! Begleiche offene Rechnungen." : "⏳ Warten, bis alle Mitglieder auf 'Fertig' geklickt haben...");
 
-                    document.getElementById('memberList').innerHTML = ents.length === 0 ? '<p class="text-xs text-gray-400">Keine Mitglieder.</p>' : ents.map(([name, m]) => `<div class="flex justify-between items-center bg-white px-3 py-2 rounded text-xs border ${m.active !== false ? '' : 'opacity-40 bg-gray-50'}"><div class="flex items-center gap-2"><button onclick="toggleMemberActive('${name}')" class="text-xs px-2 py-0.5 rounded border ${m.active !== false ? 'bg-teal-100 text-teal-900' : 'bg-gray-200'}">${m.active !== false ? '✅ Dabei' : '❌ Inaktiv'}</button><span class="font-semibold ${m.active !== false ? '' : 'line-through'}" style="color:${getUsernameColor(name)}">${name}</span></div><div class="flex items-center gap-2">${name === activeUser ? `<button onclick="openPayPalModal()" class="text-[10px] bg-teal-100 px-2 py-0.5 rounded">🅿️ PayPal</button>` : ''}<span class="px-2 py-0.5 rounded font-medium border ${m.ready ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${m.ready ? '✓ Fertig' : '⏳'}</span></div></div>`).join('');
+                    document.getElementById('memberList').innerHTML = ents.length === 0 ? '<p class="text-xs text-gray-400">Keine Mitglieder.</p>' : ents.map(([name, m]) => `<div class="flex justify-between items-center bg-white px-3 py-2 rounded text-xs border ${m.active !== false ? '' : 'opacity-40 bg-gray-50'}"><span class="font-semibold ${m.active !== false ? '' : 'line-through'}" style="color:${getUsernameColor(name)}">${name}</span><span class="px-2 py-0.5 rounded font-medium border ${m.ready ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${m.ready ? '✓ Fertig' : '⏳'}</span></div>`).join('');
 
                     let rBtn = document.getElementById('toggleReadyBtn');
                     if (activeUser && d.members?.[activeUser]?.active !== false && !arch) {
@@ -531,7 +593,24 @@
             let tx = [], i = 0, j = 0;
             while (i < debtors.length && j < creditors.length) {
                 let d = debtors[i], c = creditors[j], amt = Math.min(d.amount, c.amount), pp = aes.find(([name]) => name === c.name)?.[1]?.paypal || '';
-                tx.push(`<div class="flex justify-between items-center bg-white p-2 rounded border border-teal-200 text-xs"><span>👉 <b style="color:${getUsernameColor(d.name)}">${d.name}</b> zahlt <b>${amt.toFixed(2)} €</b> an <b style="color:${getUsernameColor(c.name)}">${c.name}</b></span>${!arch ? `<button onclick="settleDebt('${d.name}','${c.name}',${amt},${allR},'${pp}')" class="${allR ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed'} text-[10px] px-2.5 py-1 rounded font-medium">${pp ? '🅿️ PayPal' : 'Ausgleichen'}</button>` : '<span class="text-[10px] text-gray-400">Erledigt</span>'}</div>`);
+                
+                let isMyDebt = (activeUser && activeUser === d.name);
+                
+                let actionBtnHtml = '';
+                if (!arch) {
+                    if (isMyDebt) {
+                        let btnClass = allR ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed';
+                        let clickAction = allR ? `settleDebt('${d.name}','${c.name}',${amt},${allR},'${pp}')` : `alert("🔒 Erst müssen alle Mitglieder oben auf 'Fertig ✓' klicken!")`;
+                        actionBtnHtml = `<button onclick="${clickAction}" class="${btnClass} text-[10px] px-2.5 py-1 rounded font-bold shadow">✅ Rechnung beglichen</button>`;
+                    } else {
+                        actionBtnHtml = `<button onclick="settleDebt('${d.name}','${c.name}',${amt},${allR},'${pp}')" class="${allR ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed'} text-[10px] px-2.5 py-1 rounded font-medium">${pp ? '🅿️ PayPal' : 'Ausgleichen'}</button>`;
+                    }
+                } else {
+                    actionBtnHtml = '<span class="text-[10px] text-gray-400">Erledigt</span>';
+                }
+
+                tx.push(`<div class="flex justify-between items-center bg-white p-2.5 rounded border border-teal-200 text-xs gap-2"><span class="truncate">👉 <b style="color:${getUsernameColor(d.name)}">${d.name}</b> zahlt <b>${amt.toFixed(2)} €</b> an <b style="color:${getUsernameColor(c.name)}">${c.name}</b></span><div class="shrink-0">${actionBtnHtml}</div></div>`);
+                
                 d.amount -= amt; c.amount -= amt; if (d.amount < 0.01) i++; if (c.amount < 0.01) j++;
             }
             document.getElementById('settlementList').innerHTML = tx.length === 0 ? '<p class="text-xs text-emerald-700 font-medium">✨ Alles ausgeglichen!</p>' : tx.join('');
