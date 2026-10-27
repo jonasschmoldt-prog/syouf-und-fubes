@@ -26,13 +26,17 @@
 
     <div id="lotteryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"><div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl"><h2 class="text-lg font-bold text-teal-800 mb-2">🎲 Zufallsgenerator</h2><div id="lotteryParticipants" class="space-y-2 max-h-40 overflow-y-auto mb-4 border p-2 rounded-lg bg-gray-50"></div><button onclick="runLottery()" class="w-full bg-teal-700 text-white py-2 text-sm font-bold rounded-lg mb-2">Los ziehen!</button><button onclick="toggleModal('lotteryModal', false)" class="w-full bg-gray-200 text-gray-700 py-2 text-sm rounded-lg">Abbrechen</button></div></div>
     
-    <!-- Manuelles Trip Erstellen Modal mit Planer- & Admin-Auswahl -->
+    <!-- Manuelles Trip Erstellen Modal -->
     <div id="manualTripModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3">
             <h2 class="text-lg font-bold text-teal-800">🌍 Trip manuell anlegen</h2>
             <div>
                 <label class="text-[11px] font-bold text-gray-600 block mb-1">Trip-Name:</label>
                 <input type="text" id="manualTripNameInput" placeholder="z.B. Budapest 2026..." class="w-full px-3 py-2 text-xs border rounded-lg">
+            </div>
+            <div>
+                <label class="text-[11px] font-bold text-gray-600 block mb-1">📅 Zeitraum (optional, z.B. 14.07. - 21.07.2026):</label>
+                <input type="text" id="manualTripDatesInput" placeholder="TT.MM. - TT.MM.JJJJ" class="w-full px-3 py-2 text-xs border rounded-lg">
             </div>
             <div>
                 <label class="text-[11px] font-bold text-gray-600 block mb-1">👑 Planer:</label>
@@ -44,7 +48,7 @@
             </div>
             <div class="flex gap-2 pt-2">
                 <button onclick="createManualTrip()" class="flex-1 bg-teal-700 text-white py-2 text-xs font-bold rounded-lg">Erstellen</button>
-                <button onclick="toggleModal('manualTripModal', false)" class="bg-gray-200 text-gray-700 px-4 py-2 text-xs rounded-lg">Abbrechen</button>
+                <button onclick="toggleModal('manualTripModal', false)" class="bg-gray-200 text-gray-700 px-4 py-2 text-sm rounded-lg">Abbrechen</button>
             </div>
         </div>
     </div>
@@ -96,7 +100,7 @@
                 </div>
             </div>
             
-            <div id="plannerStatusDisplay" class="text-xs text-center text-gray-600 italic">Kein Planer aktiv.</div>
+            <div id="plannerStatusDisplay" class="text-xs text-center text-gray-600 italic">Bereit für neue Trips.</div>
 
             <!-- Archiv & Zukünftiger Trip Boxen -->
             <div class="grid grid-cols-2 gap-3">
@@ -107,6 +111,7 @@
                 <div onclick="openActiveTripsModal()" class="p-3 bg-teal-50 border rounded-xl cursor-pointer hover:bg-teal-100 transition">
                     <span class="text-[10px] font-bold text-teal-800 block mb-1">🚀 Zukünftiger Trip</span>
                     <h3 id="upcomingTripName" class="text-xs font-bold truncate">Keiner</h3>
+                    <span id="upcomingTripDatesSub" class="text-[10px] text-teal-700 block mt-0.5"></span>
                 </div>
             </div>
 
@@ -156,7 +161,7 @@
                         <p class="text-[11px] font-bold text-teal-800">🛠️ Admin:</p>
                         <input type="text" id="adminTitleInput" placeholder="Titel" class="w-full p-2 text-xs border rounded">
                         <textarea id="adminInfosInput" placeholder="Infos..." class="w-full p-2 text-xs border rounded" rows="2"></textarea>
-                        <input type="text" id="adminDatesInput" placeholder="Zeitraum" class="w-full p-2 text-xs border rounded">
+                        <input type="text" id="adminDatesInput" placeholder="Zeitraum (z.B. 14.07. - 21.07.2026)" class="w-full p-2 text-xs border rounded">
                         <input type="text" id="adminPollQuestion" placeholder="Umfrage-Frage" class="w-full p-2 text-xs border rounded">
                         <div>
                             <label class="text-[10px] font-bold text-gray-600 block mb-1">👑 Planer:</label>
@@ -211,6 +216,9 @@
                             <input type="number" id="expenseAmount" placeholder="Betrag" step="0.01" class="flex-1 px-3 py-2 text-sm border rounded">
                             <select id="expenseCurrency" class="w-24 px-2 py-2 text-sm border rounded"><option value="EUR">EUR (€)</option><option value="USD">USD ($)</option><option value="GBP">GBP (£)</option><option value="CHF">CHF (Fr.)</option></select>
                         </div>
+                        <div class="flex gap-2">
+                            <input type="date" id="expenseDate" class="w-full px-3 py-2 text-sm border rounded bg-white">
+                        </div>
                         <select id="expensePayer" class="w-full px-3 py-2 text-sm border rounded"></select>
                         <div>
                             <div class="flex justify-between items-center mb-1"><label class="text-xs font-semibold text-gray-600">Wer beteiligt sich?</label><div class="space-x-2"><button type="button" onclick="toggleAllParticipants(true)" class="text-[10px] text-teal-800">Alle an</button><button type="button" onclick="toggleAllParticipants(false)" class="text-[10px] text-gray-500">Alle aus</button></div></div>
@@ -243,6 +251,19 @@
         const getUsernameColor = n => { if (!n) return '#0d9488'; let h = 0; for (let i = 0; i < n.length; i++) h = n.charCodeAt(i) + ((h << 5) - h); return ['#0284c7', '#0d9488', '#16a34a', '#ca8a04', '#dc2626', '#9333ea', '#db2777', '#4f46e5'][Math.abs(h) % 8]; };
         const toggleModal = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
 
+        const getTodayIso = () => {
+            let d = new Date();
+            let pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        };
+
+        const formatDateGerman = (isoStr) => {
+            if (!isoStr) return '';
+            let p = isoStr.split('-');
+            if (p.length !== 3) return isoStr;
+            return `${p[2]}.${p[1]}.${p[0]}`;
+        };
+
         async function init() {
             document.getElementById('currentYearDisplay').innerText = `Daten-Stand • ${calYear}`;
             try {
@@ -257,6 +278,8 @@
                 curEvent = ev;
                 viewMode = 'dashboard';
             }
+
+            document.getElementById('expenseDate').value = getTodayIso();
 
             renderUI();
         }
@@ -356,7 +379,7 @@
             let w = ch[Math.floor(Math.random() * ch.length)]; appData.meta.planner = w; appData.meta.lotteryPool = ch.filter(m => m !== w);
             let auto = `Trip ${new Date().getFullYear() + 1}`, tm = {};
             for (let m in appData.meta.globalMembers) tm[m] = { ready: false, active: true, paypal: appData.meta.globalMembers[m].paypal || '' };
-            appData[auto] = { createdAt: Date.now(), planner: w, admins: [], infos: "", pollDates: "", pollQuestion: "", votes: {}, images: [], arrivals: {}, members: tm, expenses: [] };
+            appData[auto] = { createdAt: Date.now(), planner: w, admins: [], pollDates: "", infos: "", pollQuestion: "", votes: {}, images: [], arrivals: {}, members: tm, expenses: [] };
             await save(); toggleModal('lotteryModal', false); openTripDashboard(auto); alert(`🎉 ${w} wurde per Zufall als Planer ausgelost!`);
         }
 
@@ -365,6 +388,7 @@
             if (gmList.length === 0) return alert('Bitte lege zuerst Mitglieder an!');
             
             document.getElementById('manualTripNameInput').value = '';
+            document.getElementById('manualTripDatesInput').value = '';
             
             let planSel = document.getElementById('manualTripPlannerSelect');
             planSel.innerHTML = gmList.map(m => `<option value="${m}">${m}</option>`).join('');
@@ -382,6 +406,7 @@
             if (!tripName) { alert('Bitte gib einen Namen ein!'); return; }
             if (appData[tripName]) { alert('Ein Trip mit diesem Namen existiert bereits!'); return; }
 
+            let dates = document.getElementById('manualTripDatesInput').value.trim();
             let planner = document.getElementById('manualTripPlannerSelect').value;
             let admins = Array.from(document.querySelectorAll('.manual-admin-cb:checked')).map(cb => cb.value);
 
@@ -394,8 +419,8 @@
                 createdAt: Date.now(),
                 planner: planner || "Offen",
                 admins: admins,
+                pollDates: dates,
                 infos: "",
-                pollDates: "",
                 pollQuestion: "",
                 votes: {},
                 images: [],
@@ -453,12 +478,75 @@
             renderCalendar();
         }
 
+        function parseTripDates(dateStr) {
+            if (!dateStr) return [];
+            let parts = dateStr.split('-').map(s => s.trim());
+            if (parts.length < 2) return [];
+
+            let parseSingle = (str, fallbackYear) => {
+                let p = str.split('.').map(s => s.trim());
+                if (p.length < 2) return null;
+                let day = parseInt(p[0]), month = parseInt(p[1]) - 1;
+                let year = p[2] ? parseInt(p[2]) : fallbackYear;
+                if (isNaN(day) || isNaN(month)) return null;
+                return new Date(year, month, day);
+            };
+
+            let currentYear = new Date().getFullYear();
+            let endDateObj = parseSingle(parts[1], currentYear);
+            let fallbackYear = endDateObj ? endDateObj.getFullYear() : currentYear;
+            let startDateObj = parseSingle(parts[0], fallbackYear);
+
+            if (!startDateObj || !endDateObj || isNaN(startDateObj) || isNaN(endDateObj)) return [];
+
+            let dates = [];
+            let curr = new Date(startDateObj);
+            while (curr <= endDateObj) {
+                dates.push(new Date(curr));
+                curr.setDate(curr.getDate() + 1);
+            }
+            return dates;
+        }
+
         function renderCalendar() {
             document.getElementById('calendarTitle').innerText = `${["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"][calMonth]} ${calYear}`;
+            
+            // Map für Tag -> [Trip-Namen]
+            let tripDaysMap = {}; 
+            for (let ev in appData) {
+                if (ev === 'meta') continue;
+                let d = appData[ev];
+                if (d.pollDates) {
+                    let dList = parseTripDates(d.pollDates);
+                    dList.forEach(dt => {
+                        let key = `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}`;
+                        if (!tripDaysMap[key]) tripDaysMap[key] = [];
+                        tripDaysMap[key].push(ev);
+                    });
+                }
+            }
+
             let h = '', fd = (new Date(calYear, calMonth, 1).getDay() + 6) % 7, tot = new Date(calYear, calMonth + 1, 0).getDate(), prev = new Date(calYear, calMonth, 0).getDate();
             for (let i = fd - 1; i >= 0; i--) h += `<span class="py-1 text-gray-300 text-[10px]">${prev - i}</span>`;
             let t = new Date();
-            for (let d = 1; d <= tot; d++) { let isT = (d === t.getDate() && calMonth === t.getMonth() && calYear === t.getFullYear()); h += `<span class="py-1 cursor-pointer ${isT ? 'bg-teal-700 text-white font-bold rounded-full' : 'hover:bg-gray-100 rounded-full'}">${d}</span>`; }
+            
+            for (let d = 1; d <= tot; d++) {
+                let isT = (d === t.getDate() && calMonth === t.getMonth() && calYear === t.getFullYear());
+                let tripsOnThisDay = tripDaysMap[`${calYear}-${calMonth}-${d}`];
+
+                let classes = "py-1 rounded-full cursor-pointer relative ";
+                let titleAttr = "";
+                
+                if (tripsOnThisDay && tripsOnThisDay.length > 0) {
+                    classes += "bg-rose-600 text-white font-bold shadow-sm ";
+                    titleAttr = `title="Trip(s): ${tripsOnThisDay.join(', ')}"`;
+                } else if (isT) {
+                    classes += "bg-teal-700 text-white font-bold ";
+                } else {
+                    classes += "hover:bg-gray-100 ";
+                }
+                h += `<span class="${classes}" ${titleAttr}>${d}</span>`;
+            }
             document.getElementById('calendarDays').innerHTML = h;
         }
 
@@ -483,7 +571,8 @@
             });
 
             document.getElementById('activeTripsListContent').innerHTML = activeEvs.length === 0 ? '<p class="text-xs text-gray-400 italic">Keine offenen Trips.</p>' : activeEvs.map(e => {
-                return `<div class="flex items-center justify-between p-2.5 rounded text-xs border bg-teal-50 hover:bg-teal-100 text-teal-900 font-bold cursor-pointer" onclick="toggleModal('activeTripsModal',false);openTripDashboard('${e}');"><span>🚀 ${e}</span><div class="flex items-center gap-2"><span class="text-[9px] bg-teal-200 px-1.5 py-0.5 rounded">Offen</span><button onclick="deleteSpecificTrip('${e}', event)" class="text-red-500 hover:text-red-700 font-bold px-1.5 py-0.5 text-xs">✕</button></div></div>`;
+                let dInfo = appData[e].pollDates ? ` (${appData[e].pollDates})` : '';
+                return `<div class="flex items-center justify-between p-2.5 rounded text-xs border bg-teal-50 hover:bg-teal-100 text-teal-900 font-bold cursor-pointer" onclick="toggleModal('activeTripsModal',false);openTripDashboard('${e}');"><span>🚀 ${e} <span class="font-normal text-[10px] text-teal-700">${dInfo}</span></span><div class="flex items-center gap-2"><span class="text-[9px] bg-teal-200 px-1.5 py-0.5 rounded">Offen</span><button onclick="deleteSpecificTrip('${e}', event)" class="text-red-500 hover:text-red-700 font-bold px-1.5 py-0.5 text-xs">✕</button></div></div>`;
             }).join('');
             toggleModal('activeTripsModal', true);
         }
@@ -513,10 +602,10 @@
 
         async function saveExpense() {
             let d = appData[curEvent], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false); if (isArchived(d, ae)) return alert('🔒 Archiviert.');
-            let desc = document.getElementById('expenseDesc').value.trim(), raw = parseFloat(document.getElementById('expenseAmount').value), cur = document.getElementById('expenseCurrency').value, payer = document.getElementById('expensePayer').value, editIdx = parseInt(document.getElementById('editIndex').value), parts = Array.from(document.querySelectorAll('input[name="participant"]:checked')).map(cb => cb.value);
+            let desc = document.getElementById('expenseDesc').value.trim(), raw = parseFloat(document.getElementById('expenseAmount').value), cur = document.getElementById('expenseCurrency').value, dateVal = document.getElementById('expenseDate').value, payer = document.getElementById('expensePayer').value, editIdx = parseInt(document.getElementById('editIndex').value), parts = Array.from(document.querySelectorAll('input[name="participant"]:checked')).map(cb => cb.value);
             if (!desc || isNaN(raw) || raw <= 0 || !payer || parts.length === 0) return alert('Alle Felder füllen!');
             let amt = raw; if (cur !== 'EUR') { try { let res = await fetch(`https://api.frankfurter.app/latest?amount=${raw}&from=${cur}&to=EUR`), j = await res.json(); if (j?.rates?.EUR) amt = j.rates.EUR; } catch (e) { } }
-            let entry = { desc, amount: amt, originalAmount: raw !== amt ? raw : null, originalCurrency: raw !== amt ? cur : null, payer, participants: parts, createdBy: activeUser || 'Unbekannt' };
+            let entry = { desc, amount: amt, originalAmount: raw !== amt ? raw : null, originalCurrency: raw !== amt ? cur : null, date: dateVal || getTodayIso(), payer, participants: parts, createdBy: activeUser || 'Unbekannt' };
             if (editIdx === -1) appData[curEvent].expenses.push(entry); else appData[curEvent].expenses[editIdx] = entry;
             if (isArchived(appData[curEvent], ae)) appData[curEvent].images = [];
             await save(); resetForm(); renderUI();
@@ -524,14 +613,28 @@
 
         function editExpense(i) {
             let d = appData[curEvent], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false); if (isArchived(d, ae)) return alert('🔒 Archiviert.');
-            let e = d.expenses[i]; document.getElementById('expenseDesc').value = e.desc; document.getElementById('expenseAmount').value = e.originalAmount || e.amount; document.getElementById('expenseCurrency').value = e.originalCurrency || 'EUR'; document.getElementById('expensePayer').value = e.payer; document.getElementById('editIndex').value = i;
-            document.getElementById('saveExpenseBtn').innerText = 'Speichern'; document.getElementById('cancelEditBtn').classList.remove('hidden'); document.getElementById('expenseFormTitle').innerText = 'Ausgabe bearbeiten';
+            let e = d.expenses[i]; 
+            document.getElementById('expenseDesc').value = e.desc; 
+            document.getElementById('expenseAmount').value = e.originalAmount || e.amount; 
+            document.getElementById('expenseCurrency').value = e.originalCurrency || 'EUR'; 
+            document.getElementById('expenseDate').value = e.date || getTodayIso();
+            document.getElementById('expensePayer').value = e.payer; 
+            document.getElementById('editIndex').value = i;
+            document.getElementById('saveExpenseBtn').innerText = 'Speichern'; 
+            document.getElementById('cancelEditBtn').classList.remove('hidden'); 
+            document.getElementById('expenseFormTitle').innerText = 'Ausgabe bearbeiten';
             renderCheckboxes(e.participants); switchTab('mine');
         }
 
         function resetForm() {
-            document.getElementById('expenseDesc').value = ''; document.getElementById('expenseAmount').value = ''; document.getElementById('expenseCurrency').value = 'EUR'; document.getElementById('editIndex').value = '-1';
-            document.getElementById('saveExpenseBtn').innerText = 'Hinzufügen'; document.getElementById('cancelEditBtn').classList.add('hidden'); document.getElementById('expenseFormTitle').innerText = 'Ausgabe eintragen';
+            document.getElementById('expenseDesc').value = ''; 
+            document.getElementById('expenseAmount').value = ''; 
+            document.getElementById('expenseCurrency').value = 'EUR'; 
+            document.getElementById('expenseDate').value = getTodayIso();
+            document.getElementById('editIndex').value = '-1';
+            document.getElementById('saveExpenseBtn').innerText = 'Hinzufügen'; 
+            document.getElementById('cancelEditBtn').classList.add('hidden'); 
+            document.getElementById('expenseFormTitle').innerText = 'Ausgabe eintragen';
             renderCheckboxes();
         }
 
@@ -547,6 +650,7 @@
                 appData[curEvent].expenses.push({ 
                     desc: `💸 Ausgleich: ${from} an ${to}`, 
                     amount: amount, 
+                    date: getTodayIso(),
                     payer: from, 
                     participants: [to], 
                     createdBy: activeUser || 'Unbekannt' 
@@ -586,8 +690,11 @@
             });
             if (activeEvs.length > 0) {
                 document.getElementById('upcomingTripName').innerText = activeEvs[0];
+                let activeDates = appData[activeEvs[0]].pollDates;
+                document.getElementById('upcomingTripDatesSub').innerText = activeDates ? `📅 ${activeDates}` : "";
             } else {
                 document.getElementById('upcomingTripName').innerText = "Keiner";
+                document.getElementById('upcomingTripDatesSub').innerText = "";
             }
 
             let archivedEvs = evs.filter(e => {
@@ -611,7 +718,6 @@
             } else {
                 let d = appData[curEvent], ents = Object.entries(d.members || {}), aes = ents.filter(([_, m]) => m.active !== false), allR = aes.length > 0 && aes.every(([_, m]) => m.ready), arch = isArchived(d, aes);
                 let admins = d.admins || [];
-                let isUserAdmin = activeUser && (d.planner === activeUser || admins.includes(activeUser));
 
                 let headerClass = arch ? "flex justify-between items-center bg-gray-700 text-white p-3 rounded-xl" : "flex justify-between items-center bg-teal-900 text-white p-3 rounded-xl";
                 document.getElementById('tripHeaderBox').className = headerClass;
@@ -652,7 +758,7 @@
                     document.getElementById('arrivalList').innerHTML = Object.keys(d.arrivals || {}).length === 0 ? '<span class="text-gray-400 italic">Keine.</span>' : Object.entries(d.arrivals).map(([u, t]) => `<div>✈️ <span style="color:${getUsernameColor(u)};font-weight:bold">${u}:</span> ${t}</div>`).join('');
 
                     let aeArea = document.getElementById('adminEditArea'); 
-                    aeArea.classList.toggle('hidden', arch); // Jedes Mitglied kann bearbeiten oder Admins (wie gewünscht unkompliziert)
+                    aeArea.classList.toggle('hidden', arch);
                     
                     document.getElementById('adminTitleInput').value = curEvent;
                     document.getElementById('adminInfosInput').value = d.infos || '';
@@ -682,9 +788,15 @@
                     pSel.innerHTML = '<option value="">Wer hat gezahlt?</option>' + aes.map(([m]) => `<option value="${m}">${m}</option>`).join('');
                     pSel.value = prevP || activeUser;
 
-                    if (parseInt(document.getElementById('editIndex').value) === -1) renderCheckboxes();
+                    if (parseInt(document.getElementById('editIndex').value) === -1) {
+                        renderCheckboxes();
+                        document.getElementById('expenseDate').value = getTodayIso();
+                    }
 
-                    const renderExps = (list, isMy = false) => list.length === 0 ? '<p class="text-xs text-gray-400">Keine.</p>' : list.map(e => `<div class="flex justify-between items-center bg-gray-50 p-2.5 rounded text-xs border"><div>${!isMy ? `<span class="font-bold" style="color:${getUsernameColor(e.payer)}">${e.payer}</span> zahlte ` : ''}<span class="font-semibold">${e.amount.toFixed(2)} €</span> für <i>"${e.desc}"</i></div>${!arch ? `<div class="flex gap-1"><button onclick="editExpense(${e.i})" class="bg-teal-100 px-2 py-1 rounded">Edit</button><button onclick="deleteExpense(${e.i})" class="bg-red-100 px-2 py-1 rounded">X</button></div>` : ''}</div>`).join('');
+                    const renderExps = (list, isMy = false) => list.length === 0 ? '<p class="text-xs text-gray-400">Keine.</p>' : list.map(e => {
+                        let dateFormatted = e.date ? ` <span class="text-[10px] text-gray-400">(${formatDateGerman(e.date)})</span>` : '';
+                        return `<div class="flex justify-between items-center bg-gray-50 p-2.5 rounded text-xs border"><div>${!isMy ? `<span class="font-bold" style="color:${getUsernameColor(e.payer)}">${e.payer}</span> zahlte ` : ''}<span class="font-semibold">${e.amount.toFixed(2)} €</span> für <i>"${e.desc}"</i>${dateFormatted}</div>${!arch ? `<div class="flex gap-1"><button onclick="editExpense(${e.i})" class="bg-teal-100 px-2 py-1 rounded">Edit</button><button onclick="deleteExpense(${e.i})" class="bg-red-100 px-2 py-1 rounded">X</button></div>` : ''}</div>`;
+                    }).join('');
 
                     document.getElementById('expenseList').innerHTML = renderExps(d.expenses.map((e, i) => ({ ...e, i })));
                     document.getElementById('myExpenseList').innerHTML = renderExps(d.expenses.map((e, i) => ({ ...e, i })).filter(e => e.payer === activeUser), true);
