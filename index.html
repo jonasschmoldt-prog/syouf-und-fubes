@@ -15,104 +15,72 @@
 </head>
 <body class="text-gray-800 font-sans pb-10 min-h-screen">
     <!-- Modals -->
-    <div id="userModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"><div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center"><h2 class="text-lg font-bold text-teal-800 mb-2">👋 Wer bist du?</h2><div id="modalUserList" class="space-y-2 mb-3"></div><div class="border-t pt-3 mt-3"><input type="text" id="newUserNameInput" placeholder="Neuer Name..." class="w-full px-3 py-2 text-xs border rounded mb-2"><input type="text" id="newUserPaypalInput" placeholder="PayPal.me Name (optional)" class="w-full px-3 py-2 text-xs border rounded mb-2"><button onclick="registerNewUserFromModal()" class="w-full bg-teal-700 text-white py-2 text-xs font-bold rounded">Registrieren & Starten</button></div></div></div>
-    <div id="paypalModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"><div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl"><h2 class="text-lg font-bold text-teal-800 mb-2">🅿️ PayPal-Link</h2><input type="text" id="paypalInput" placeholder="maxmustermann" class="w-full px-3 py-2 text-sm border rounded-lg mb-4"><div class="flex gap-2"><button onclick="savePayPalLink()" class="flex-1 bg-teal-700 text-white py-2 text-sm rounded-lg">Speichern</button><button onclick="toggleModal('paypalModal', false)" class="bg-gray-200 text-gray-700 px-4 py-2 text-sm rounded-lg">Abbrechen</button></div></div></div>
+    <div id="userModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"><div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center"><h2 class="text-lg font-bold text-teal-800 mb-2">👋 Wer bist du?</h2><div id="modalUserList" class="space-y-2 mb-3"></div><div class="border-t pt-3 mt-3"><input type="text" id="newUserNameInput" placeholder="Neuer Name..." class="w-full px-3 py-2 text-xs border rounded mb-2"><button onclick="registerNewUser()" class="w-full bg-teal-700 text-white py-2 text-xs font-bold rounded">Registrieren & Starten</button></div></div></div>
     
-    <!-- Archiv-Auswahl-Modal -->
     <div id="historyModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"><div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl"><h2 class="text-lg font-bold text-teal-800 mb-3">📜 Archiv-Auswahl</h2><div id="historyListContent" class="space-y-2 max-h-60 overflow-y-auto mb-4"></div><button onclick="toggleModal('historyModal', false)" class="w-full bg-gray-200 text-gray-700 py-2 text-sm rounded-lg">Schließen</button></div></div>
 
-    <!-- Aktive Trips Auswahl-Modal -->
     <div id="activeTripsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"><div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl"><h2 class="text-lg font-bold text-teal-800 mb-3">🚀 Zukünftige / Offene Trips</h2><div id="activeTripsListContent" class="space-y-2 max-h-60 overflow-y-auto mb-4"></div><button onclick="toggleModal('activeTripsModal', false)" class="w-full bg-gray-200 text-gray-700 py-2 text-sm rounded-lg">Schließen</button></div></div>
 
-    <div id="lotteryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden"><div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl"><h2 class="text-lg font-bold text-teal-800 mb-2">🎲 Zufallsgenerator</h2><div id="lotteryParticipants" class="space-y-2 max-h-40 overflow-y-auto mb-4 border p-2 rounded-lg bg-gray-50"></div><button onclick="runLottery()" class="w-full bg-teal-700 text-white py-2 text-sm font-bold rounded-lg mb-2">Los ziehen!</button><button onclick="toggleModal('lotteryModal', false)" class="w-full bg-gray-200 text-gray-700 py-2 text-sm rounded-lg">Abbrechen</button></div></div>
+    <!-- Zufallsgenerator Modal mit Slot-Animation -->
+    <div id="lotteryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center space-y-3">
+            <h2 class="text-lg font-bold text-teal-800">🎲 Zufallsgenerator</h2>
+            <div id="lotteryParticipants" class="space-y-2 max-h-36 overflow-y-auto border p-2 rounded-lg bg-gray-50 text-left"></div>
+            
+            <div id="lotteryAnimationBox" class="h-16 bg-teal-900 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-inner overflow-hidden relative hidden">
+                <span id="lotterySpinnerName" class="transition-all duration-75">Bereit...</span>
+            </div>
+
+            <button id="lotteryDrawBtn" onclick="runLotteryAnimation()" class="w-full bg-teal-700 hover:bg-teal-600 text-white py-2.5 text-sm font-bold rounded-lg shadow">Los ziehen!</button>
+            <button id="lotteryCloseBtn" onclick="toggleModal('lotteryModal', false)" class="w-full bg-gray-200 text-gray-700 py-2 text-xs rounded-lg">Abbrechen</button>
+        </div>
+    </div>
     
-    <!-- Manuelles Trip Erstellen Modal -->
     <div id="manualTripModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-3">
-            <h2 class="text-lg font-bold text-teal-800">🌍 Trip manuell anlegen</h2>
-            <div>
-                <label class="text-[11px] font-bold text-gray-600 block mb-1">Trip-Name:</label>
-                <input type="text" id="manualTripNameInput" placeholder="z.B. Budapest 2026..." class="w-full px-3 py-2 text-xs border rounded-lg">
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-gray-600 block mb-1">📅 Zeitraum (optional, z.B. 14.07. - 21.07.2026):</label>
-                <input type="text" id="manualTripDatesInput" placeholder="TT.MM. - TT.MM.JJJJ" class="w-full px-3 py-2 text-xs border rounded-lg">
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-gray-600 block mb-1">👑 Planer:</label>
-                <select id="manualTripPlannerSelect" class="w-full px-3 py-2 text-xs border rounded-lg"></select>
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-gray-600 block mb-1">🛡️ Weitere Admins (optional):</label>
-                <div id="manualTripAdminsList" class="space-y-1 max-h-28 overflow-y-auto border p-2 rounded-lg bg-gray-50"></div>
-            </div>
-            <div class="flex gap-2 pt-2">
-                <button onclick="createManualTrip()" class="flex-1 bg-teal-700 text-white py-2 text-xs font-bold rounded-lg">Erstellen</button>
-                <button onclick="toggleModal('manualTripModal', false)" class="bg-gray-200 text-gray-700 px-4 py-2 text-sm rounded-lg">Abbrechen</button>
-            </div>
+            <h2 class="text-lg font-bold text-teal-800">🌍 Trip anlegen</h2>
+            <div><label class="text-[11px] font-bold text-gray-600 block mb-1">Trip-Name:</label><input type="text" id="manualTripNameInput" placeholder="z.B. Trip 2027..." class="w-full px-3 py-2 text-xs border rounded-lg"></div>
+            <div><label class="text-[11px] font-bold text-gray-600 block mb-1">📅 Zeitraum (optional):</label><input type="text" id="manualTripDatesInput" placeholder="TT.MM. - TT.MM.JJJJ" class="w-full px-3 py-2 text-xs border rounded-lg"></div>
+            <div><label class="text-[11px] font-bold text-gray-600 block mb-1">👑 Haupt-Admin:</label><div id="manualTripMainAdminDisplay" class="w-full px-3 py-2 text-xs bg-gray-100 font-bold rounded-lg text-teal-900">-</div></div>
+            <div><label class="text-[11px] font-bold text-gray-600 block mb-1">🛡️ Zusätzliche Admins:</label><div id="manualTripAdminsList" class="space-y-1 max-h-32 overflow-y-auto border p-2 rounded-lg bg-gray-50"></div></div>
+            <div class="flex gap-2 pt-2"><button onclick="createManualTrip()" class="flex-1 bg-teal-700 text-white py-2 text-xs font-bold rounded-lg">Erstellen</button><button onclick="toggleModal('manualTripModal', false)" class="bg-gray-200 text-gray-700 px-4 py-2 text-sm rounded-lg">Abbrechen</button></div>
         </div>
     </div>
 
     <!-- Main Container -->
     <div class="max-w-md mx-auto p-4 sm:p-6 my-6 bg-white rounded-2xl shadow-lg border border-gray-200">
-        <!-- Home Button links oben & User-Anzeige rechts -->
-        <div class="flex justify-between items-center mb-1">
-            <button onclick="goToDashboard()" class="text-base font-bold text-teal-900 hover:text-teal-700 flex items-center gap-1.5 text-left bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 shadow-sm">
-                🏠 <span class="truncate">Home</span>
-            </button>
-            <button onclick="openUserModalManual()" class="text-xs bg-teal-50 text-teal-900 px-2.5 py-1.5 rounded-full font-medium border border-teal-200 shrink-0">👤 <span id="currentUserDisplay">Wählen...</span></button>
-        </div>
-        
-        <!-- Aktualisieren & Jahr Bar -->
-        <div class="flex justify-between items-center mb-4 mt-2 px-1">
-            <span class="text-xs text-gray-500 font-medium" id="currentYearDisplay">Jahr</span>
-            <button onclick="location.reload()" class="bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 px-3 py-1 text-xs font-bold rounded-lg shadow-sm flex items-center gap-1">
-                🔄 Aktualisieren
-            </button>
-        </div>
-
         <!-- Dashboard View -->
         <div id="viewDashboard" class="space-y-4">
-            <!-- Mitglieder & PayPal -->
-            <div class="p-4 bg-gray-50 rounded-xl border">
-                <h2 class="text-xs font-bold text-gray-700 uppercase mb-2">👥 Mitglieder & PayPal</h2>
-                <div class="space-y-2 mb-3">
-                    <input type="text" id="globalMemberName" placeholder="Name..." class="w-full px-3 py-2 text-xs border rounded-lg">
-                    <input type="text" id="globalMemberPaypal" placeholder="PayPal.me Name (optional)" class="w-full px-3 py-2 text-xs border rounded-lg">
-                    <button onclick="addGlobalMember()" class="w-full bg-teal-700 text-white py-2 text-xs font-bold rounded-lg">Hinzufügen</button>
-                </div>
-                <div id="globalMemberList" class="flex flex-wrap gap-1.5"></div>
+            <!-- App-Name links & Benutzer-Button (User) ganz oben rechts -->
+            <div class="flex justify-between items-center mb-2">
+                <h1 class="text-lg font-extrabold text-teal-900 tracking-wide">Syouf und Fubes</h1>
+                <button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200 shadow-sm">👤 <span id="currentUserDisplay">Wählen...</span></button>
             </div>
 
-            <!-- Optionen zum Trip anlegen -->
+            <!-- Datum-Stand & Aktualisieren-Button darunter getauscht -->
+            <div class="flex justify-between items-center mb-2 px-1">
+                <span class="text-xs text-gray-500 font-medium" id="currentDateDisplay">Daten-Stand</span>
+                <button onclick="location.reload()" class="bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 px-3 py-1.5 text-xs font-bold rounded-xl shadow-sm flex items-center gap-1">🔄 Aktualisieren</button>
+            </div>
+
+            <!-- Dashboard Mitglieder-Bereich -->
+            <div class="p-4 bg-gray-50 rounded-xl border space-y-3">
+                <h2 class="text-xs font-bold text-gray-700 uppercase">👥 Mitglieder</h2>
+                <div class="space-y-2">
+                    <input type="text" id="globalMemberName" placeholder="Name..." class="w-full px-3 py-2 text-xs border rounded-lg">
+                    <button onclick="addGlobalMember()" class="w-full bg-teal-700 text-white py-2 text-xs font-bold rounded-lg">Mitglied hinzufügen</button>
+                </div>
+                <div id="globalMemberList" class="flex flex-wrap gap-1.5 pt-1"></div>
+            </div>
+
             <div class="grid grid-cols-2 gap-3">
-                <div class="p-4 bg-teal-900 text-white rounded-xl flex flex-col justify-between">
-                    <div>
-                        <h2 class="text-xs font-semibold uppercase text-teal-200 mb-1">🎲 Zufall</h2>
-                    </div>
-                    <button onclick="openLotteryModal()" class="w-full mt-2 bg-teal-700 hover:bg-teal-600 text-white py-1.5 text-xs font-bold rounded-lg shadow">Los ziehen</button>
-                </div>
-                <div class="p-4 bg-teal-800 text-white rounded-xl flex flex-col justify-between">
-                    <div>
-                        <h2 class="text-xs font-semibold uppercase text-teal-200 mb-1">🌍 Manuell</h2>
-                    </div>
-                    <button onclick="openManualTripModal()" class="w-full mt-2 bg-teal-700 hover:bg-teal-600 text-white py-1.5 text-xs font-bold rounded-lg shadow">Trip anlegen</button>
-                </div>
+                <div class="p-4 bg-teal-900 text-white rounded-xl flex flex-col justify-between"><h2 class="text-xs font-semibold uppercase text-teal-200 mb-1">🎲 Zufall</h2><button onclick="openLotteryModal()" class="w-full mt-2 bg-teal-700 hover:bg-teal-600 text-white py-1.5 text-xs font-bold rounded-lg shadow">Los ziehen</button></div>
+                <div class="p-4 bg-teal-800 text-white rounded-xl flex flex-col justify-between"><h2 class="text-xs font-semibold uppercase text-teal-200 mb-1">🌍 Manuell</h2><button onclick="openManualTripModal()" class="w-full mt-2 bg-teal-700 hover:bg-teal-600 text-white py-1.5 text-xs font-bold rounded-lg shadow">Trip anlegen</button></div>
             </div>
             
-            <div id="plannerStatusDisplay" class="text-xs text-center text-gray-600 italic">Bereit für neue Trips.</div>
-
-            <!-- Archiv & Zukünftiger Trip Boxen -->
             <div class="grid grid-cols-2 gap-3">
-                <div onclick="openHistoryModal()" class="p-3 bg-gray-50 border rounded-xl cursor-pointer hover:bg-gray-100 transition">
-                    <span class="text-[10px] font-bold text-gray-600 block mb-1">📜 Archiv</span>
-                    <h3 id="lastArchivedTripName" class="text-xs font-bold truncate">Keines</h3>
-                </div>
-                <div onclick="openActiveTripsModal()" class="p-3 bg-teal-50 border rounded-xl cursor-pointer hover:bg-teal-100 transition">
-                    <span class="text-[10px] font-bold text-teal-800 block mb-1">🚀 Zukünftiger Trip</span>
-                    <h3 id="upcomingTripName" class="text-xs font-bold truncate">Keiner</h3>
-                    <span id="upcomingTripDatesSub" class="text-[10px] text-teal-700 block mt-0.5"></span>
-                </div>
+                <div onclick="openHistoryModal()" class="p-3 bg-gray-50 border rounded-xl cursor-pointer hover:bg-gray-100 transition"><span class="text-[10px] font-bold text-gray-600 block mb-1">📜 Archiv</span><h3 id="lastArchivedTripName" class="text-xs font-bold truncate">Keines</h3></div>
+                <div onclick="openActiveTripsModal()" class="p-3 bg-teal-50 border rounded-xl cursor-pointer hover:bg-teal-100 transition relative"><div id="homeBadgeContainer" class="absolute -top-1.5 -right-1.5 hidden"></div><span class="text-[10px] font-bold text-teal-800 block mb-1">🚀 Aktiver Trip</span><h3 id="upcomingTripName" class="text-xs font-bold truncate">Keiner</h3><span id="upcomingTripDatesSub" class="text-[10px] text-teal-700 block mt-0.5"></span></div>
             </div>
 
             <div class="p-4 bg-gray-50 rounded-xl border">
@@ -128,111 +96,170 @@
 
         <!-- Trip Dashboard View -->
         <div id="viewTripDashboard" class="space-y-4 hidden">
-            <div id="tripHeaderBox" class="flex justify-between items-center bg-teal-900 text-white p-3 rounded-xl">
-                <div><span id="tripHeaderSub" class="text-[10px] uppercase text-teal-300">Zentrale</span><h2 id="tripDashboardTitle" class="text-sm font-bold">Trip</h2></div>
-            </div>
-            
-            <!-- Mitglieder in der Reisezentrale verwalten / hinzufügen -->
-            <div class="p-4 bg-teal-50/50 rounded-xl border">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-xs font-bold text-teal-900 uppercase">👥 Teilnehmer im Trip</h2>
-                    <button onclick="addMemberToCurrentTripPrompt()" class="text-[10px] bg-teal-700 text-white px-2.5 py-1 rounded font-bold shadow">+ Hinzufügen</button>
-                </div>
-                <div id="tripDashboardMemberList" class="flex flex-wrap gap-1.5"></div>
+            <div class="flex justify-between items-center">
+                <button onclick="goToDashboard()" class="text-sm font-bold text-teal-900 hover:text-teal-700 flex items-center gap-1 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 shadow-sm">🏠 Home</button>
+                <button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200">👤 <span id="currentUserDisplayTrip">Wählen...</span></button>
             </div>
 
-            <div class="flex border-b mb-2 bg-gray-50 p-1 rounded-xl">
-                <button onclick="switchTripTab('info')" id="tripTabBtn-info" class="flex-1 pb-2 pt-1 text-xs font-bold text-teal-900 border-b-2 border-teal-800">📋 Infos</button>
-                <button onclick="switchTripTab('photos')" id="tripTabBtn-photos" class="flex-1 pb-2 pt-1 text-xs font-bold text-gray-500 border-b-2 border-transparent">📸 Fotos</button>
-            </div>
-            
-            <div id="tripTabContent-info" class="space-y-4">
-                <div class="p-4 bg-teal-50/50 rounded-xl border border-teal-200 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span id="tripDashboardPlanner" class="text-[10px] bg-teal-200 text-teal-900 px-2 py-0.5 rounded font-bold">Planer</span>
-                        <span id="tripDashboardDates" class="text-xs font-bold text-teal-900">Termin offen</span>
-                    </div>
-                    <div id="tripDashboardAdminsContainer" class="text-[11px] text-gray-600 bg-white p-2 rounded border hidden">
-                        🛡️ <b>Weitere Admins:</b> <span id="tripDashboardAdminsList">Keine</span>
-                    </div>
-                    <div class="border-t pt-2"><h3 class="text-xs font-bold mb-1">📌 Infos</h3><div id="tripDashboardInfos" class="text-xs text-gray-700 bg-white p-2.5 rounded-lg border min-h-[40px]">Keine.</div></div>
-                    <div id="tripDashboardPollSec" class="hidden border-t pt-2"><p id="pollQuestionText" class="text-[11px] font-bold mb-1">📊 Umfrage</p><div class="flex gap-2"><select id="pollAnswerSelect" class="flex-1 p-1.5 text-xs border rounded"><option value="Ja">Ja</option><option value="Nein">Nein</option><option value="Vielleicht">Vielleicht</option></select><button onclick="votePoll()" class="bg-teal-700 text-white px-3 py-1.5 rounded text-xs">Stimmen</button></div><div id="pollVotesList" class="text-[11px] mt-2 space-y-1 bg-white p-2 rounded border"></div></div>
-                    <div id="adminEditArea" class="hidden border-t pt-3 space-y-2 bg-white p-3 rounded border">
-                        <p class="text-[11px] font-bold text-teal-800">🛠️ Admin:</p>
-                        <input type="text" id="adminTitleInput" placeholder="Titel" class="w-full p-2 text-xs border rounded">
-                        <textarea id="adminInfosInput" placeholder="Infos..." class="w-full p-2 text-xs border rounded" rows="2"></textarea>
-                        <input type="text" id="adminDatesInput" placeholder="Zeitraum (z.B. 14.07. - 21.07.2026)" class="w-full p-2 text-xs border rounded">
-                        <input type="text" id="adminPollQuestion" placeholder="Umfrage-Frage" class="w-full p-2 text-xs border rounded">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-600 block mb-1">👑 Planer:</label>
-                            <select id="transferAdminSelect" class="w-full p-1.5 text-xs border rounded"></select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-600 block mb-1">🛡️ Weitere Admins verwalten:</label>
-                            <div id="adminCheckboxesContainer" class="space-y-1 max-h-24 overflow-y-auto border p-2 rounded bg-gray-50"></div>
-                        </div>
-                        <button onclick="saveAdminChanges()" class="w-full bg-teal-800 text-white py-2 text-xs font-bold rounded">💾 Speichern</button>
-                    </div>
-                </div>
-                <button onclick="openSplitMoney()" class="w-full bg-teal-700 text-white py-3 text-sm font-bold rounded-xl shadow">💸 Zum Money Split 👉</button>
-                <button onclick="deleteEvent()" class="text-[10px] text-red-500 underline block mx-auto">Trip löschen</button>
+            <div class="bg-teal-900 text-white p-3 rounded-xl text-center">
+                <span id="tripHeaderSub" class="text-[10px] uppercase text-teal-300 block">Zentrale</span>
+                <h2 id="tripDashboardTitle" class="text-sm font-bold">Name</h2>
             </div>
 
-            <div id="tripTabContent-photos" class="space-y-4 hidden">
-                <div class="p-4 bg-teal-50/50 rounded-xl border space-y-2"><h3 class="text-xs font-bold uppercase">✈️ Ankünfte</h3><div id="arrivalList" class="space-y-1.5 text-xs bg-white p-2.5 rounded border min-h-[40px]"></div><div class="flex gap-1 pt-1"><input type="text" id="arrivalInput" placeholder="Ankunft..." class="flex-1 p-2 text-xs border rounded"><button onclick="saveArrival()" class="bg-teal-700 text-white px-3 py-1 text-xs rounded">Eintragen</button></div></div>
-                <div class="p-4 bg-teal-50/50 rounded-xl border space-y-3"><div class="flex justify-between items-center"><h3 class="text-xs font-bold uppercase">📸 Fotos</h3><label id="uploadPhotoBtnLabel" class="bg-teal-700 text-white text-xs px-3 py-1 rounded cursor-pointer">Hochladen<input type="file" id="memberImageInput" accept="image/*" onchange="handleMemberImageUpload(event)" class="hidden"></label></div><div id="tripImageContainer" class="hidden"><div id="tripImageDisplay" class="grid grid-cols-2 gap-2"></div></div><div id="noImagesText" class="text-xs text-gray-400 italic text-center py-4 bg-white rounded border">Keine Fotos.</div></div>
+            <div class="bg-teal-50/50 rounded-xl border overflow-hidden">
+                <button type="button" onclick="toggleParticipantsDropdown()" class="w-full px-4 py-2.5 text-xs font-bold text-teal-900 bg-teal-50 flex justify-between items-center">
+                    <span>👥 Teilnehmer (<span id="participantCountLabel">0</span>)</span>
+                    <span id="participantsArrow">▼</span>
+                </button>
+                <div id="participantsDropdownContent" class="p-3 hidden border-t bg-white space-y-2">
+                    <div id="tripDashboardMemberList" class="flex flex-wrap gap-1.5"></div>
+                    <div id="adminParticipantControls" class="hidden pt-2 mt-2 border-t">
+                        <button onclick="addMemberToTrip()" class="text-[10px] bg-teal-700 text-white px-3 py-1.5 rounded font-bold shadow w-full">+ Neuer Teilnehmer hinzufügen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div id="moneySplitBadgeContainer" class="absolute -top-1 -right-2 z-10 hidden"></div>
+                <button onclick="openSplitMoney()" class="w-full bg-teal-700 hover:bg-teal-600 text-white py-3 text-sm font-bold rounded-xl shadow">💸 Zum Money Split 👉</button>
+            </div>
+
+            <div id="mainRoleTabContainer" class="flex bg-gray-200 p-1 rounded-xl">
+                <button onclick="switchMainRoleTab('edit')" id="mainTabBtn-edit" class="flex-1 py-2 text-xs font-bold text-gray-600 rounded-lg">🛠️ Bearbeiten (Admin)</button>
+                <button onclick="switchMainRoleTab('preview')" id="mainTabBtn-preview" class="flex-1 py-2 text-xs font-bold bg-white text-teal-900 rounded-lg shadow-sm">👁️ Live-Vorschau</button>
+            </div>
+
+            <div id="mainTabContent-edit" class="space-y-4 hidden">
+                <div class="flex border-b bg-gray-50 p-1 rounded-xl">
+                    <button onclick="switchAdminEditTab('infos')" id="adminEditTabBtn-infos" class="flex-1 pb-2 pt-1 text-xs font-bold text-teal-900 border-b-2 border-teal-800">📋 Infos</button>
+                    <button onclick="switchAdminEditTab('accommodations')" id="adminEditTabBtn-accommodations" class="flex-1 pb-2 pt-1 text-xs font-bold text-gray-500 border-b-2 border-transparent">🏨 Unterkünfte & Checkliste</button>
+                    <button onclick="switchAdminEditTab('settings')" id="adminEditTabBtn-settings" class="flex-1 pb-2 pt-1 text-xs font-bold text-gray-500 border-b-2 border-transparent">⚙️ Einstellungen</button>
+                </div>
+
+                <div id="adminEditContent-infos" class="space-y-3 bg-white p-4 rounded-xl border">
+                    <div><label class="text-[10px] font-bold text-gray-600 block mb-1">🏷️ Name des Trips:</label><input type="text" id="adminTitleInput" class="w-full p-2 text-xs border rounded"></div>
+                    
+                    <div class="border rounded-lg p-2.5 bg-gray-50 space-y-2">
+                        <label class="text-[10px] font-bold text-teal-900 block">📅 Zeitraum des Trips:</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div><span class="text-[9px] text-gray-500 block mb-0.5">Von:</span><input type="date" id="adminDateStart" class="w-full p-1.5 text-xs border rounded bg-white" onchange="updateDateRangeString()"></div>
+                            <div><span class="text-[9px] text-gray-500 block mb-0.5">Bis:</span><input type="date" id="adminDateEnd" class="w-full p-1.5 text-xs border rounded bg-white" onchange="updateDateRangeString()"></div>
+                        </div>
+                        <input type="text" id="adminDatesInput" class="w-full p-2 text-xs border rounded bg-white font-semibold text-teal-900" placeholder="TT.MM.JJJJ - TT.MM.JJJJ">
+                    </div>
+
+                    <div><label class="text-[10px] font-bold text-gray-600 block mb-1">📌 Allgemeine Infos:</label><textarea id="adminInfosInput" class="w-full p-2 text-xs border rounded" rows="3"></textarea></div>
+                    <div class="border rounded-lg p-2.5 bg-gray-50 space-y-2"><label class="text-[10px] font-bold text-teal-900 block">📊 Umfragen:</label><div id="adminPollsListEditor" class="space-y-3"></div><button type="button" onclick="addPollField()" class="w-full bg-teal-50 text-teal-900 py-1.5 text-[11px] font-bold rounded-lg">+ Umfrage</button></div>
+                    
+                    <button onclick="saveAdminChanges()" class="w-full bg-teal-800 text-white py-2 text-xs font-bold rounded mt-2">💾 Speichern (Infos)</button>
+                </div>
+
+                <div id="adminEditContent-accommodations" class="space-y-3 bg-white p-4 rounded-xl border hidden">
+                    <div class="border rounded-lg p-2.5 bg-gray-50 space-y-2"><label class="text-[10px] font-bold text-teal-900 block">🏨 Unterkünfte:</label><div id="adminAccommodationsListEditor" class="space-y-2"></div><button type="button" onclick="addAccommodationField()" class="w-full bg-teal-50 text-teal-900 py-1.5 text-[11px] font-bold rounded-lg">+ Unterkunft</button></div>
+                    <div class="border rounded-lg p-2.5 bg-gray-50 space-y-2"><label class="text-[10px] font-bold text-teal-900 block">🎒 Checkliste:</label><div id="adminChecklistEditor" class="space-y-2"></div><button type="button" onclick="addChecklistItemField()" class="w-full bg-teal-50 text-teal-900 py-1.5 text-[11px] font-bold rounded-lg">+ Stichpunkt</button></div>
+                    <button onclick="saveAdminChanges()" class="w-full bg-teal-800 text-white py-2 text-xs font-bold rounded mt-2">💾 Speichern (Unterkünfte)</button>
+                </div>
+
+                <div id="adminEditContent-settings" class="space-y-3 bg-white p-4 rounded-xl border hidden">
+                    <div><label class="text-[10px] font-bold text-gray-600 block mb-1">👑 Planer:</label><select id="transferAdminSelect" class="w-full p-1.5 text-xs border rounded"></select></div>
+                    <div class="border rounded-lg bg-gray-50 overflow-hidden"><button type="button" onclick="toggleAdminDropdown()" class="w-full px-3 py-2 text-xs font-bold text-teal-900 bg-teal-50 flex justify-between items-center"><span>🛡️ Admins (<span id="adminCountLabel">0</span>)</span><span>▼</span></button><div id="adminCheckboxesContainer" class="space-y-1 max-h-32 overflow-y-auto p-2 hidden border-t bg-white"></div></div>
+                    <button onclick="saveAdminChanges()" class="w-full bg-teal-800 text-white py-2 text-xs font-bold rounded mt-2">💾 Speichern (Einstellungen)</button>
+                    <button id="deleteTripBtn" onclick="deleteEvent()" class="text-xs text-red-500 underline block mx-auto pt-4">Trip löschen</button>
+                </div>
+            </div>
+
+            <div id="mainTabContent-preview" class="space-y-4">
+                <div class="flex border-b bg-gray-50 p-1 rounded-xl">
+                    <button onclick="switchPreviewTab('infos')" id="previewTabBtn-infos" class="flex-1 pb-2 pt-1 text-xs font-bold text-teal-900 border-b-2 border-teal-800 relative">📋 Infos <span id="badgeInfos" class="absolute top-0.5 right-1 bg-rose-600 text-white text-[9px] px-1.5 py-0.2 rounded-full hidden">0</span></button>
+                    <button onclick="switchPreviewTab('accommodations')" id="previewTabBtn-accommodations" class="flex-1 pb-2 pt-1 text-xs font-bold text-gray-500 border-b-2 border-transparent relative">🏨 Unterkünfte & Checkliste <span id="badgeAccommodations" class="absolute top-0.5 right-1 bg-rose-600 text-white text-[9px] px-1.5 py-0.2 rounded-full hidden">0</span></button>
+                    <button onclick="switchPreviewTab('travel')" id="previewTabBtn-travel" class="flex-1 pb-2 pt-1 text-xs font-bold text-gray-500 border-b-2 border-transparent relative">🚗 Ab- und Anfahrt <span id="badgeTravel" class="absolute top-0.5 right-1 bg-rose-600 text-white text-[9px] px-1.5 py-0.2 rounded-full hidden">0</span></button>
+                </div>
+
+                <div id="previewContent-infos" class="space-y-4">
+                    <div class="p-4 bg-teal-50/50 rounded-xl border border-teal-200 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span id="tripDashboardPlanner" class="text-[10px] bg-teal-200 text-teal-900 px-2 py-0.5 rounded font-bold">Planer</span>
+                            <span id="tripDashboardDates" class="text-xs font-bold text-teal-900">Termin offen</span>
+                        </div>
+                        <div id="tripDashboardAdminsContainer" class="text-[11px] text-gray-600 bg-white p-2 rounded border hidden">🛡️ <b>Admins:</b> <span id="tripDashboardAdminsList">Keine</span></div>
+                        
+                        <div class="border-t pt-2"><h3 class="text-xs font-bold mb-1">📌 Allgemeine Infos</h3><div id="tripDashboardInfos" class="text-xs text-gray-700 bg-white p-2.5 rounded-lg border min-h-[40px]">Keine Infos.</div></div>
+                        <div class="border-t pt-2"><h3 class="text-xs font-bold mb-1">📊 Umfragen & Diagramme</h3><div id="tripDashboardPollsContainer" class="space-y-3 text-xs"><div class="text-gray-400 italic bg-white p-2.5 rounded-lg border">Keine Umfragen.</div></div></div>
+                    </div>
+                </div>
+
+                <div id="previewContent-accommodations" class="space-y-4 hidden">
+                    <div class="p-4 bg-teal-50/50 rounded-xl border border-teal-200 space-y-3">
+                        <div><h3 class="text-xs font-bold mb-1">🏨 Unterkünfte</h3><div id="tripDashboardAccommodations" class="space-y-2 text-xs"><div class="text-gray-400 italic bg-white p-2.5 rounded-lg border">Keine Unterkünfte.</div></div></div>
+                        <div class="border-t pt-2"><h3 class="text-xs font-bold mb-1">🎒 Checkliste</h3><div id="tripDashboardChecklist" class="text-xs text-gray-700 bg-white p-2.5 rounded-lg border min-h-[40px]"><span class="text-gray-400 italic">Keine Punkte.</span></div></div>
+                    </div>
+                </div>
+
+                <div id="previewContent-travel" class="space-y-4 hidden">
+                    <div class="p-4 bg-teal-50/50 rounded-xl border space-y-2"><h3 class="text-xs font-bold uppercase">🚗 Ab- und Anfahrt</h3><div id="arrivalList" class="space-y-1.5 text-xs bg-white p-2.5 rounded border min-h-[40px]"></div><div class="flex gap-1 pt-1"><input type="text" id="arrivalInput" placeholder="Anfahrt-Details..." class="flex-1 p-2 text-xs border rounded"><button onclick="saveArrival()" class="bg-teal-700 text-white px-3 py-1 text-xs rounded">Eintragen</button></div></div>
+                </div>
             </div>
         </div>
 
         <!-- Split Money View -->
         <div id="viewSplitMoney" class="space-y-4 hidden">
-            <div id="moneyHeaderBox" class="flex justify-between items-center bg-teal-900 text-white p-3 rounded-xl">
-                <div><span id="moneyHeaderSub" class="text-[10px] uppercase text-teal-300">Kasse</span><h2 id="activeTripTitle" class="text-sm font-bold">Rubrik</h2></div>
-                <button onclick="openTripDashboard(curEvent)" class="bg-teal-700 px-3 py-1.5 text-xs font-bold rounded-lg shadow">🔙 Zur Info</button>
+            <div class="flex justify-between items-center">
+                <button onclick="goToDashboard()" class="text-sm font-bold text-teal-900 hover:text-teal-700 flex items-center gap-1 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 shadow-sm">🏠 Home</button>
+                <button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200">👤 <span id="currentUserDisplayMoney">Wählen...</span></button>
+            </div>
+
+            <div id="moneyHeaderBox" class="bg-teal-900 text-white p-3 rounded-xl text-center">
+                <span class="text-[10px] uppercase text-teal-300 block">Money Split</span>
+                <h2 id="activeTripTitle" class="text-sm font-bold">Rubrik</h2>
+            </div>
+
+            <div>
+                <button onclick="openTripDashboard(curEvent)" class="w-full bg-teal-800 hover:bg-teal-700 text-white py-2 text-xs font-bold rounded-xl shadow border border-teal-700">🔙 Zur Zentrale</button>
             </div>
             
-            <!-- Teilnehmer-Sektion -->
-            <div class="p-4 bg-teal-50/50 rounded-xl border">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm font-semibold">1. Teilnehmer</h2>
-                    <button id="toggleReadyBtn" onclick="toggleReady()" class="hidden text-xs px-3 py-1 rounded font-semibold bg-teal-700 text-white">⏳ Fertig ✓</button>
+            <div class="bg-teal-50/50 rounded-xl border overflow-hidden">
+                <button type="button" onclick="toggleMoneyParticipantsDropdown()" class="w-full px-4 py-2.5 text-xs font-bold text-teal-900 bg-teal-50 flex justify-between items-center">
+                    <span>Teilnehmer (<span id="moneyParticipantCountLabel">0</span>)</span>
+                    <span id="moneyParticipantsArrow">▼</span>
+                </button>
+                <div id="moneyParticipantsDropdownContent" class="p-3 hidden border-t bg-white space-y-2">
+                    <div class="flex justify-between items-center mb-1"><span class="text-[11px] text-gray-500">Freigaben-Status:</span><button id="toggleReadyBtn" onclick="toggleReady()" class="hidden text-xs px-3 py-1 rounded font-semibold bg-teal-700 text-white">📋 Alle Rechnungen eingetragen</button></div>
+                    <div id="memberList" class="space-y-2"></div>
                 </div>
-                <div id="memberList" class="space-y-2"></div>
             </div>
 
             <div class="flex border-b mb-2">
                 <button onclick="switchTab('mine')" id="tabBtn-mine" class="flex-1 pb-2 text-xs font-bold text-teal-900 border-b-2 border-teal-800">💸 Meine</button>
-                <button onclick="switchTab('all')" id="tabBtn-all" class="flex-1 pb-2 text-xs font-bold text-gray-500 border-b-2 border-transparent">📋 Alle</button>
+                <button onclick="switchTab('all')" id="tabBtn-all" class="flex-1 pb-2 text-xs font-bold text-gray-500 border-b-2 border-transparent relative">📋 Alle <span id="allTabBadge" class="absolute top-0 right-4 bg-rose-600 text-white text-[9px] px-1.5 py-0.2 rounded-full hidden">0</span></button>
                 <button onclick="switchTab('settlement')" id="tabBtn-settlement" class="flex-1 pb-2 text-xs font-bold text-gray-500 border-b-2 border-transparent">⚖️ Abrechnung</button>
             </div>
+            
             <div id="tabContent-mine" class="space-y-4">
                 <div id="personalBalanceBox" class="p-3 bg-gray-50 rounded-xl border text-xs text-center">Wähle Namen.</div>
-                <div id="expenseFormWrapper" class="p-4 bg-gray-50 rounded-xl border">
+                <div class="p-4 bg-gray-50 rounded-xl border space-y-3">
                     <h2 class="text-sm font-semibold mb-2" id="expenseFormTitle">Ausgabe eintragen</h2>
                     <input type="hidden" id="editIndex" value="-1">
-                    <div class="space-y-3">
-                        <input type="text" id="expenseDesc" placeholder="Wofür?" class="w-full px-3 py-2 text-sm border rounded">
-                        <div class="flex gap-2">
-                            <input type="number" id="expenseAmount" placeholder="Betrag" step="0.01" class="flex-1 px-3 py-2 text-sm border rounded">
-                            <select id="expenseCurrency" class="w-24 px-2 py-2 text-sm border rounded"><option value="EUR">EUR (€)</option><option value="USD">USD ($)</option><option value="GBP">GBP (£)</option><option value="CHF">CHF (Fr.)</option></select>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="date" id="expenseDate" class="w-full px-3 py-2 text-sm border rounded bg-white">
-                        </div>
-                        <select id="expensePayer" class="w-full px-3 py-2 text-sm border rounded"></select>
-                        <div>
-                            <div class="flex justify-between items-center mb-1"><label class="text-xs font-semibold text-gray-600">Wer beteiligt sich?</label><div class="space-x-2"><button type="button" onclick="toggleAllParticipants(true)" class="text-[10px] text-teal-800">Alle an</button><button type="button" onclick="toggleAllParticipants(false)" class="text-[10px] text-gray-500">Alle aus</button></div></div>
-                            <div id="splitParticipants" class="flex flex-wrap gap-2 p-2 bg-white rounded border min-h-[40px]"></div>
-                        </div>
-                        <div class="flex gap-2 pt-1">
-                            <button id="saveExpenseBtn" onclick="saveExpense()" class="flex-1 bg-teal-700 text-white py-2 text-sm rounded">Hinzufügen</button>
-                            <button id="cancelEditBtn" onclick="resetForm()" class="hidden bg-gray-200 text-gray-700 px-3 py-2 text-sm rounded">Abbrechen</button>
-                        </div>
+                    <input type="text" id="expenseDesc" placeholder="Wofür?" class="w-full px-3 py-2 text-sm border rounded">
+                    <div class="flex gap-2">
+                        <input type="number" id="expenseAmount" placeholder="Betrag" step="0.01" class="flex-1 px-3 py-2 text-sm border rounded">
+                        <select id="expenseCurrency" class="w-24 px-2 py-2 text-sm border rounded"><option value="EUR">EUR (€)</option><option value="USD">USD ($)</option><option value="GBP">GBP (£)</option><option value="CHF">CHF (Fr.)</option></select>
+                    </div>
+                    <input type="date" id="expenseDate" class="w-full px-3 py-2 text-sm border rounded bg-white">
+                    <select id="expensePayer" class="w-full px-3 py-2 text-sm border rounded"></select>
+                    <div>
+                        <div class="flex justify-between items-center mb-1"><label class="text-xs font-semibold text-gray-600">Wer beteiligt sich?</label><div class="space-x-2"><button type="button" onclick="toggleAllParticipants(true)" class="text-[10px] text-teal-800">Alle an</button><button type="button" onclick="toggleAllParticipants(false)" class="text-[10px] text-gray-500">Alle aus</button></div></div>
+                        <div id="splitParticipants" class="flex flex-wrap gap-2 p-2 bg-white rounded border min-h-[40px]"></div>
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <button id="saveExpenseBtn" onclick="saveExpense()" class="flex-1 bg-teal-700 text-white py-2 text-sm rounded">Hinzufügen</button>
+                        <button id="cancelEditBtn" onclick="resetForm()" class="hidden bg-gray-200 text-gray-700 px-3 py-2 text-sm rounded">Abbrechen</button>
                     </div>
                 </div>
                 <div><h3 class="text-xs font-bold text-teal-900 uppercase mb-2">Deine Ausgaben</h3><div id="myExpenseList" class="space-y-2 max-h-48 overflow-y-auto"></div></div>
             </div>
+            
             <div id="tabContent-all" class="space-y-4 hidden"><h3 class="text-xs font-bold text-teal-900 uppercase mb-2">Alle Belege</h3><div id="expenseList" class="space-y-2 max-h-96 overflow-y-auto"></div></div>
+            
             <div id="tabContent-settlement" class="space-y-4 hidden">
                 <div class="p-4 bg-gray-50 rounded-xl border"><h3 class="text-xs font-bold uppercase mb-2">📊 Kassenstand</h3><div id="balanceBarList" class="space-y-2"></div></div>
                 <div class="p-4 bg-teal-50/50 rounded-xl border"><h2 class="text-sm font-semibold mb-1">🎯 Abrechnung</h2><p id="settlementInfoText" class="text-[11px] text-teal-800 mb-3 italic">Warten...</p><div id="settlementList" class="space-y-2 text-sm"></div></div>
@@ -246,96 +273,163 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_UITIUTzraVt57MAo7Pjcuw_-l7mOzC9';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let appData = { "meta": { planner: null, lotteryPool: [], globalMembers: {} } };
-        let curEvent = new URLSearchParams(window.location.search).get('event') || null, viewMode = new URLSearchParams(window.location.search).get('view') || 'dashboard', activeUser = localStorage.getItem('syoufActiveUser') || '', calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+        let curEvent = new URLSearchParams(window.location.search).get('event') || null;
+        let viewMode = new URLSearchParams(window.location.search).get('view') || 'dashboard';
+        let activeUser = localStorage.getItem('syoufActiveUser') || '';
+        let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+        let editingPollsOpenState = {};
+
+        const getUserSeens = () => JSON.parse(localStorage.getItem('syoufUserSeensMap') || '{}');
+        const saveUserSeens = map => localStorage.setItem('syoufUserSeensMap', JSON.stringify(map));
 
         const getUsernameColor = n => { if (!n) return '#0d9488'; let h = 0; for (let i = 0; i < n.length; i++) h = n.charCodeAt(i) + ((h << 5) - h); return ['#0284c7', '#0d9488', '#16a34a', '#ca8a04', '#dc2626', '#9333ea', '#db2777', '#4f46e5'][Math.abs(h) % 8]; };
         const toggleModal = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
-
-        const getTodayIso = () => {
-            let d = new Date();
-            let pad = n => String(n).padStart(2, '0');
-            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-        };
-
-        const formatDateGerman = (isoStr) => {
-            if (!isoStr) return '';
-            let p = isoStr.split('-');
-            if (p.length !== 3) return isoStr;
-            return `${p[2]}.${p[1]}.${p[0]}`;
-        };
+        const isUserAdmin = tn => activeUser && tn && appData[tn] && (appData[tn].planner === activeUser || (appData[tn].admins || []).includes(activeUser));
+        const getTodayIso = () => { let d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+        const isArchived = (d, ae) => d.expenses.length > 0 && ae.length > 0 && ae.every(([_, m]) => m.ready) && checkEverythingSettled(ae, d.expenses);
 
         async function init() {
-            document.getElementById('currentYearDisplay').innerText = `Daten-Stand • ${calYear}`;
+            // Exaktes aktuelles Datum anzeigen (z.B. "Daten-Stand • 30.10.2026")
+            let now = new Date();
+            let dateStr = `${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()}`;
+            document.getElementById('currentDateDisplay').innerText = `Daten-Stand • ${dateStr}`;
+
             try {
                 const { data } = await sb.from('split_data').select('*').eq('id', 'main_store').single();
                 if (data?.data) { appData = data.data; if (!appData.meta) appData.meta = { planner: null, lotteryPool: [], globalMembers: {} }; if (!appData.meta.globalMembers) appData.meta.globalMembers = {}; }
                 else { await sb.from('split_data').upsert({ id: 'main_store', data: appData }); }
-            } catch (e) { alert("⚠️ Fehler beim Laden der Daten."); }
+            } catch (e) { alert("⚠️ Fehler beim Laden."); }
             
-            let urlParams = new URLSearchParams(window.location.search);
-            let ev = urlParams.get('event');
-            if (ev) {
-                curEvent = ev;
-                viewMode = 'dashboard';
-            }
-
+            let ev = new URLSearchParams(window.location.search).get('event');
+            if (ev) { curEvent = ev; viewMode = 'dashboard'; markSeen(ev, 'all'); }
             document.getElementById('expenseDate').value = getTodayIso();
-
             renderUI();
         }
 
         async function save() { await sb.from('split_data').upsert({ id: 'main_store', data: appData }); }
-        const isArchived = (d, ae) => d.expenses.length > 0 && ae.length > 0 && ae.every(([_, m]) => m.ready) && checkEverythingSettled(ae, d.expenses);
-
-        function goToDashboard() { curEvent = null; viewMode = 'dashboard'; history.pushState({}, '', window.location.pathname); renderUI(); }
-        function openTripDashboard(n) { curEvent = n; viewMode = 'dashboard'; history.pushState({}, '', `?event=${encodeURIComponent(n)}&view=dashboard`); renderUI(); }
-        function openSplitMoney() { viewMode = 'money'; history.pushState({}, '', `?event=${encodeURIComponent(curEvent)}&view=money`); renderUI(); }
         
-        function openCurrentTrip() { 
-            let evs = Object.keys(appData).filter(k => k !== 'meta').sort((a, b) => appData[b].createdAt - appData[a].createdAt);
-            let activeEvs = evs.filter(e => {
-                let d = appData[e], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false);
-                return !isArchived(d, ae);
-            });
-            if (activeEvs.length > 0) openTripDashboard(activeEvs[0]);
+        function goToDashboard() { curEvent = null; viewMode = 'dashboard'; history.pushState({}, '', window.location.pathname); renderUI(); }
+        function openTripDashboard(n) { curEvent = n; viewMode = 'dashboard'; markSeen(n, 'all'); history.pushState({}, '', `?event=${encodeURIComponent(n)}&view=dashboard`); renderUI(); }
+        function openSplitMoney() { viewMode = 'money'; if (curEvent) { markSeen(curEvent, 'money'); } history.pushState({}, '', `?event=${encodeURIComponent(curEvent)}&view=money`); renderUI(); }
+        
+        function markSeen(n, tab) {
+            if (!n || !appData[n] || !activeUser) return;
+            let d = appData[n];
+            let map = getUserSeens();
+            map[activeUser] = map[activeUser] || {};
+            map[activeUser][n] = map[activeUser][n] || {};
+            
+            if (tab === 'all' || tab === 'infos') {
+                map[activeUser][n].lastInfosCount = (d.infos ? 1 : 0) + (d.polls || []).length;
+            }
+            if (tab === 'all' || tab === 'accommodations') {
+                map[activeUser][n].lastAccCount = (d.accommodations || []).length + (d.checklist || []).length;
+            }
+            if (tab === 'all' || tab === 'travel') {
+                map[activeUser][n].lastTravelCount = Object.keys(d.arrivals || {}).length;
+            }
+            if (tab === 'all' || tab === 'money') {
+                map[activeUser][n].lastMoneyCount = (d.expenses || []).length;
+            }
+            saveUserSeens(map);
         }
 
-        function switchTripTab(t) { ['info', 'photos'].forEach(x => { document.getElementById(`tripTabContent-${x}`).classList.toggle('hidden', x !== t); document.getElementById(`tripTabBtn-${x}`).className = `flex-1 pb-2 pt-1 text-xs font-bold ${x === t ? 'text-teal-900 border-b-2 border-teal-800' : 'text-gray-500 border-b-2 border-transparent'}`; }); }
-        function switchTab(t) { ['mine', 'all', 'settlement'].forEach(x => { document.getElementById(`tabContent-${x}`).classList.toggle('hidden', x !== t); document.getElementById(`tabBtn-${x}`).className = `flex-1 pb-2 text-xs font-bold ${x === t ? 'text-teal-900 border-b-2 border-teal-800' : 'text-gray-500 border-b-2 border-transparent'}`; }); }
+        const getUnread = (n, tab) => {
+            if (!n || !appData[n] || !activeUser) return 0;
+            let d = appData[n];
+            let map = getUserSeens();
+            let uData = map[activeUser]?.[n] || {};
+            
+            if (tab === 'infos') {
+                let current = (d.infos ? 1 : 0) + (d.polls || []).length;
+                return Math.max(0, current - (uData.lastInfosCount || 0));
+            }
+            if (tab === 'accommodations') {
+                let current = (d.accommodations || []).length + (d.checklist || []).length;
+                return Math.max(0, current - (uData.lastAccCount || 0));
+            }
+            if (tab === 'travel') {
+                let current = Object.keys(d.arrivals || {}).length;
+                return Math.max(0, current - (uData.lastTravelCount || 0));
+            }
+            if (tab === 'money') {
+                let current = (d.expenses || []).length;
+                return Math.max(0, current - (uData.lastMoneyCount || 0));
+            }
+            if (tab === 'total') {
+                let inf = (d.infos ? 1 : 0) + (d.polls || []).length - (uData.lastInfosCount || 0);
+                let acc = (d.accommodations || []).length + (d.checklist || []).length - (uData.lastAccCount || 0);
+                let trv = Object.keys(d.arrivals || {}).length - (uData.lastTravelCount || 0);
+                let mon = (d.expenses || []).length - (uData.lastMoneyCount || 0);
+                return Math.max(0, inf) + Math.max(0, acc) + Math.max(0, trv) + Math.max(0, mon);
+            }
+            return 0;
+        };
+
+        function switchMainRoleTab(t) {
+            ['edit', 'preview'].forEach(x => {
+                document.getElementById(`mainTabContent-${x}`).classList.toggle('hidden', x !== t);
+                document.getElementById(`mainTabBtn-${x}`).className = `flex-1 py-2 text-xs font-bold ${x === t ? 'bg-white text-teal-900 rounded-lg shadow-sm' : 'text-gray-600 rounded-lg'}`;
+            });
+        }
+
+        function switchAdminEditTab(t) {
+            ['infos', 'accommodations', 'settings'].forEach(x => {
+                document.getElementById(`adminEditContent-${x}`).classList.toggle('hidden', x !== t);
+                document.getElementById(`adminEditTabBtn-${x}`).className = `flex-1 pb-2 pt-1 text-xs font-bold ${x === t ? 'text-teal-900 border-b-2 border-teal-800' : 'text-gray-500 border-b-2 border-transparent'}`;
+            });
+        }
+
+        function switchPreviewTab(t) {
+            ['infos', 'accommodations', 'travel'].forEach(x => {
+                document.getElementById(`previewContent-${x}`).classList.toggle('hidden', x !== t);
+                document.getElementById(`previewTabBtn-${x}`).className = `flex-1 pb-2 pt-1 text-xs font-bold ${x === t ? 'text-teal-900 border-b-2 border-teal-800' : 'text-gray-500 border-b-2 border-transparent'}`;
+            });
+            if (curEvent) { markSeen(curEvent, t); renderUI(); }
+        }
+
+        function switchTab(t) {
+            ['mine', 'all', 'settlement'].forEach(x => {
+                document.getElementById(`tabContent-${x}`).classList.toggle('hidden', x !== t);
+                document.getElementById(`tabBtn-${x}`).className = `flex-1 pb-2 text-xs font-bold ${x === t ? 'text-teal-900 border-b-2 border-teal-800' : 'text-gray-500 border-b-2 border-transparent'}`;
+            });
+            if ((t === 'all' || t === 'mine') && curEvent && activeUser) {
+                markSeen(curEvent, 'money');
+                renderUI();
+            }
+        }
+
+        function toggleParticipantsDropdown() {
+            let box = document.getElementById('participantsDropdownContent');
+            let arrow = document.getElementById('participantsArrow');
+            let isHidden = box.classList.contains('hidden');
+            box.classList.toggle('hidden', !isHidden);
+            arrow.innerText = isHidden ? '▲' : '▼';
+        }
+
+        function toggleMoneyParticipantsDropdown() {
+            let box = document.getElementById('moneyParticipantsDropdownContent');
+            let arrow = box.previousElementSibling.lastElementChild;
+            let isHidden = box.classList.contains('hidden');
+            box.classList.toggle('hidden', !isHidden);
+            arrow.innerText = isHidden ? '▲' : '▼';
+        }
 
         async function addGlobalMember() {
             let n = document.getElementById('globalMemberName').value.trim(); if (!n) return;
-            let pp = document.getElementById('globalMemberPaypal').value.trim().replace(/^https?:\/\/(www\.)?paypal\.me\//i, '').replace(/^\//, '');
-            if (!appData.meta.globalMembers) appData.meta.globalMembers = {};
-            appData.meta.globalMembers[n] = { paypal: pp };
+            appData.meta.globalMembers = appData.meta.globalMembers || {};
+            appData.meta.globalMembers[n] = { paypal: '' };
             document.getElementById('globalMemberName').value = '';
-            document.getElementById('globalMemberPaypal').value = '';
-            for (let ev in appData) { if (ev !== 'meta') { if (!appData[ev].members) appData[ev].members = {}; if (!appData[ev].members[n]) appData[ev].members[n] = { ready: false, active: true, paypal: pp }; } }
+            for (let ev in appData) if (ev !== 'meta') { appData[ev].members = appData[ev].members || {}; appData[ev].members[n] = { ready: false, active: true, paypal: '' }; }
             if (!activeUser) selectUser(n); await save(); renderUI();
         }
 
-        async function addMemberToCurrentTripPrompt() {
-            let name = prompt("Name des neuen Mitreisenden:");
-            if (!name || !name.trim()) return;
-            let n = name.trim();
-            
-            if (!appData.meta.globalMembers) appData.meta.globalMembers = {};
-            if (!appData.meta.globalMembers[n]) {
-                appData.meta.globalMembers[n] = { paypal: '' };
-            }
-
-            for (let ev in appData) {
-                if (ev !== 'meta') {
-                    if (!appData[ev].members) appData[ev].members = {};
-                    if (!appData[ev].members[n]) {
-                        appData[ev].members[n] = { ready: false, active: true, paypal: '' };
-                    }
-                }
-            }
-
-            await save();
-            renderUI();
-            alert(`✅ ${n} wurde zum Trip hinzugefügt!`);
+        async function addMemberToTrip() {
+            let n = prompt("Name des neuen Mitreisenden:")?.trim(); if (!n) return;
+            appData.meta.globalMembers = appData.meta.globalMembers || {};
+            appData.meta.globalMembers[n] = appData.meta.globalMembers[n] || { paypal: '' };
+            for (let ev in appData) if (ev !== 'meta') { appData[ev].members = appData[ev].members || {}; appData[ev].members[n] = { ready: false, active: true, paypal: '' }; }
+            await save(); renderUI(); alert(`✅ ${n} hinzugefügt!`);
         }
 
         async function deleteGlobalMember(n) {
@@ -347,455 +441,440 @@
             }
         }
 
-        async function registerNewUserFromModal() {
-            let n = document.getElementById('newUserNameInput').value.trim(); if (!n) return alert('Bitte Namen eingeben!');
-            let pp = document.getElementById('newUserPaypalInput').value.trim().replace(/^https?:\/\/(www\.)?paypal\.me\//i, '').replace(/^\//, '');
-            if (!appData.meta.globalMembers) appData.meta.globalMembers = {};
-            appData.meta.globalMembers[n] = { paypal: pp };
-            for (let ev in appData) { if (ev !== 'meta') { if (!appData[ev].members) appData[ev].members = {}; if (!appData[ev].members[n]) appData[ev].members[n] = { ready: false, active: true, paypal: pp }; } }
+        async function registerNewUser() {
+            let n = document.getElementById('newUserNameInput').value.trim(); if (!n) return alert('Name eingeben!');
+            appData.meta.globalMembers = appData.meta.globalMembers || {};
+            appData.meta.globalMembers[n] = { paypal: '' };
+            for (let ev in appData) if (ev !== 'meta') { appData[ev].members = appData[ev].members || {}; appData[ev].members[n] = { ready: false, active: true, paypal: '' }; }
             selectUser(n); await save(); renderUI();
-        }
-
-        async function handleMemberImageUpload(e) {
-            let f = e.target.files[0]; if (!f || !curEvent) return; let d = appData[curEvent], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false); if (isArchived(d, ae)) return alert('🔒 Archiviert.');
-            let r = new FileReader(); r.onload = e => { let img = new Image(); img.onload = async () => { let c = document.createElement('canvas'); c.width = 400; c.height = img.height * (400 / img.width); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); if (!appData[curEvent].images) appData[curEvent].images = []; appData[curEvent].images.push({ url: c.toDataURL('image/jpeg', 0.7), by: activeUser || 'Unbekannt' }); await save(); renderUI(); }; img.src = e.target.result; }; r.readAsDataURL(f);
         }
 
         async function saveArrival() {
             let t = document.getElementById('arrivalInput').value.trim(); if (!t || !activeUser) return alert('Text & Name wählen.');
-            if (!appData[curEvent].arrivals) appData[curEvent].arrivals = {};
+            appData[curEvent].arrivals = appData[curEvent].arrivals || {};
             appData[curEvent].arrivals[activeUser] = t; document.getElementById('arrivalInput').value = ''; await save(); renderUI();
         }
 
         function openLotteryModal() {
             let gmList = Object.keys(appData.meta.globalMembers || {}); if (gmList.length === 0) return alert('Mitglieder anlegen!');
             let pool = appData.meta.lotteryPool || gmList;
-            document.getElementById('lotteryParticipants').innerHTML = gmList.map(m => `<label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" value="${m}" ${pool.includes(m) ? 'checked' : ''} class="lottery-cb geohammer-checkbox"><span style="color:${getUsernameColor(m)};font-weight:bold">${m}</span></label>`).join('');
+            document.getElementById('lotteryParticipants').innerHTML = gmList.map(m => `<label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" value="${m}" ${pool.includes(m)?'checked':''} class="lottery-cb geohammer-checkbox"><span style="color:${getUsernameColor(m)};font-weight:bold">${m}</span></label>`).join('');
+            document.getElementById('lotteryAnimationBox').classList.add('hidden');
+            document.getElementById('lotteryDrawBtn').classList.remove('hidden');
+            document.getElementById('lotteryCloseBtn').classList.remove('hidden');
             toggleModal('lotteryModal', true);
         }
 
-        async function runLottery() {
-            let ch = Array.from(document.querySelectorAll('.lottery-cb:checked')).map(cb => cb.value); if (ch.length === 0) return alert('Wählen!');
-            let w = ch[Math.floor(Math.random() * ch.length)]; appData.meta.planner = w; appData.meta.lotteryPool = ch.filter(m => m !== w);
-            let auto = `Trip ${new Date().getFullYear() + 1}`, tm = {};
-            for (let m in appData.meta.globalMembers) tm[m] = { ready: false, active: true, paypal: appData.meta.globalMembers[m].paypal || '' };
-            appData[auto] = { createdAt: Date.now(), planner: w, admins: [], pollDates: "", infos: "", pollQuestion: "", votes: {}, images: [], arrivals: {}, members: tm, expenses: [] };
-            await save(); toggleModal('lotteryModal', false); openTripDashboard(auto); alert(`🎉 ${w} wurde per Zufall als Planer ausgelost!`);
+        function runLotteryAnimation() {
+            let ch = Array.from(document.querySelectorAll('.lottery-cb:checked')).map(cb => cb.value); 
+            if (ch.length === 0) return alert('Bitte mindestens ein Mitglied auswählen!');
+            
+            let animBox = document.getElementById('lotteryAnimationBox');
+            let spinner = document.getElementById('lotterySpinnerName');
+            let drawBtn = document.getElementById('lotteryDrawBtn');
+            let closeBtn = document.getElementById('lotteryCloseBtn');
+
+            animBox.classList.remove('hidden');
+            drawBtn.classList.add('hidden');
+            closeBtn.classList.add('hidden');
+
+            let w = ch[Math.floor(Math.random() * ch.length)];
+            let counter = 0;
+            let totalSteps = 25;
+            let delay = 50;
+
+            function step() {
+                let randomName = ch[Math.floor(Math.random() * ch.length)];
+                spinner.innerText = randomName;
+                counter++;
+
+                if (counter < totalSteps) {
+                    delay += 15;
+                    setTimeout(step, delay);
+                } else {
+                    spinner.innerText = `🎉 ${w} hat gewonnen!`;
+                    setTimeout(() => {
+                        finalizeLottery(w, ch);
+                    }, 1500);
+                }
+            }
+            step();
+        }
+
+        async function finalizeLottery(w, ch) {
+            appData.meta.planner = w; 
+            appData.meta.lotteryPool = ch.filter(m => m !== w);
+            
+            let baseYear = new Date().getFullYear() + 1;
+            let tripName = `Trip ${baseYear}`;
+            while (appData[tripName]) {
+                baseYear++;
+                tripName = `Trip ${baseYear}`;
+            }
+
+            let tm = {}; for (let m in appData.meta.globalMembers) tm[m] = { ready: false, active: true, paypal: '' };
+            appData[tripName] = { createdAt: Date.now(), planner: w, admins: [], pollDates: "", infos: "", accommodations: [], checklist: [], polls: [], arrivals: {}, members: tm, expenses: [] };
+            await save(); 
+            toggleModal('lotteryModal', false); 
+            openTripDashboard(tripName);
         }
 
         function openManualTripModal() {
-            let gmList = Object.keys(appData.meta.globalMembers || {});
-            if (gmList.length === 0) return alert('Bitte lege zuerst Mitglieder an!');
-            
-            document.getElementById('manualTripNameInput').value = '';
-            document.getElementById('manualTripDatesInput').value = '';
-            
-            let planSel = document.getElementById('manualTripPlannerSelect');
-            planSel.innerHTML = gmList.map(m => `<option value="${m}">${m}</option>`).join('');
-            if (activeUser && gmList.includes(activeUser)) planSel.value = activeUser;
+            let gmList = Object.keys(appData.meta.globalMembers || {}); if (gmList.length === 0) return alert('Mitglieder anlegen!'); if (!activeUser) return alert('Wer bist du?');
+            let baseYear = new Date().getFullYear() + 1;
+            let tripName = `Trip ${baseYear}`;
+            while (appData[tripName]) { baseYear++; tripName = `Trip ${baseYear}`; }
 
-            let admCont = document.getElementById('manualTripAdminsList');
-            admCont.innerHTML = gmList.map(m => `<label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" value="${m}" class="manual-admin-cb geohammer-checkbox"><span>${m}</span></label>`).join('');
-
+            document.getElementById('manualTripNameInput').value = tripName; 
+            document.getElementById('manualTripDatesInput').value = ''; 
+            document.getElementById('manualTripMainAdminDisplay').innerText = activeUser;
+            document.getElementById('manualTripAdminsList').innerHTML = gmList.filter(m => m !== activeUser).map(m => `<label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" value="${m}" class="manual-admin-cb geohammer-checkbox"><span>${m}</span></label>`).join('') || '<span class="text-[10px] text-gray-400 italic">Keine weiteren Mitglieder.</span>';
             toggleModal('manualTripModal', true);
         }
 
         async function createManualTrip() {
-            let nameInput = document.getElementById('manualTripNameInput');
-            let tripName = nameInput ? nameInput.value.trim() : '';
-            if (!tripName) { alert('Bitte gib einen Namen ein!'); return; }
-            if (appData[tripName]) { alert('Ein Trip mit diesem Namen existiert bereits!'); return; }
-
-            let dates = document.getElementById('manualTripDatesInput').value.trim();
-            let planner = document.getElementById('manualTripPlannerSelect').value;
-            let admins = Array.from(document.querySelectorAll('.manual-admin-cb:checked')).map(cb => cb.value);
-
-            let tm = {};
-            for (let m in appData.meta.globalMembers) {
-                tm[m] = { ready: false, active: true, paypal: appData.meta.globalMembers[m].paypal || '' };
-            }
-
-            appData[tripName] = {
-                createdAt: Date.now(),
-                planner: planner || "Offen",
-                admins: admins,
-                pollDates: dates,
-                infos: "",
-                pollQuestion: "",
-                votes: {},
-                images: [],
-                arrivals: {},
-                members: tm,
-                expenses: []
-            };
-
-            await save();
-            toggleModal('manualTripModal', false);
-            openTripDashboard(tripName);
+            let tripName = document.getElementById('manualTripNameInput').value.trim(); if (!tripName) return alert('Namen eingeben!'); if (appData[tripName]) return alert('Existiert bereits!');
+            let tm = {}; for (let m in appData.meta.globalMembers) tm[m] = { ready: false, active: true, paypal: '' };
+            appData[tripName] = { createdAt: Date.now(), planner: activeUser, admins: Array.from(document.querySelectorAll('.manual-admin-cb:checked')).map(cb => cb.value), pollDates: document.getElementById('manualTripDatesInput').value.trim(), infos: "", accommodations: [], checklist: [], polls: [], arrivals: {}, members: tm, expenses: [] };
+            await save(); toggleModal('manualTripModal', false); openTripDashboard(tripName);
         }
 
         async function deleteEvent() {
-            if (confirm(`Trip "${curEvent}" wirklich löschen?`)) { 
-                delete appData[curEvent]; 
-                await save(); 
-                goToDashboard(); 
-            }
+            if (!isUserAdmin(curEvent)) return alert('🔒 Nur Admins!');
+            if (confirm(`Trip "${curEvent}" löschen?`)) { delete appData[curEvent]; await save(); goToDashboard(); }
         }
 
-        async function deleteSpecificTrip(eventName, event) {
-            event.stopPropagation(); 
-            if (confirm(`Trip "${eventName}" wirklich unwiderruflich löschen?`)) {
-                delete appData[eventName];
-                await save();
-                toggleModal('historyModal', false);
-                toggleModal('activeTripsModal', false);
-                goToDashboard();
+        async function deleteSpecificTrip(n, e) {
+            e.stopPropagation(); if (!isUserAdmin(n)) return alert('🔒 Nur Admins!');
+            if (confirm(`Trip "${n}" löschen?`)) { delete appData[n]; await save(); toggleModal('historyModal', false); toggleModal('activeTripsModal', false); goToDashboard(); }
+        }
+
+        function toggleAdminDropdown() { document.getElementById('adminCheckboxesContainer').classList.toggle('hidden'); }
+
+        function addAccommodationField(name = '', address = '') {
+            let div = document.createElement('div'); div.className = "flex gap-2 items-center bg-white p-2 rounded border accommodation-row";
+            div.innerHTML = `<div class="flex-1 space-y-1"><input type="text" placeholder="Bezeichnung" value="${name}" class="w-full p-1.5 text-xs border rounded acc-name"><input type="text" placeholder="Adresse" value="${address}" class="w-full p-1.5 text-xs border rounded acc-address"></div><button type="button" onclick="this.parentElement.remove()" class="text-red-500 font-bold px-2 py-1 text-xs">✕</button>`;
+            document.getElementById('adminAccommodationsListEditor').appendChild(div);
+        }
+
+        function addChecklistItemField(text = '') {
+            let div = document.createElement('div'); div.className = "flex gap-2 items-center bg-white p-2 rounded border checklist-row";
+            div.innerHTML = `<input type="text" placeholder="Stichpunkt" value="${text}" class="flex-1 p-1.5 text-xs border rounded chk-text"><button type="button" onclick="this.parentElement.remove()" class="text-red-500 font-bold px-2 py-1 text-xs">✕</button>`;
+            document.getElementById('adminChecklistEditor').appendChild(div);
+        }
+
+        function addPollField(q = '', opts = '10.-12.06., 17.-19.06., 24.-26.06.') {
+            let div = document.createElement('div'); div.className = "p-2.5 bg-white rounded border space-y-2 poll-row";
+            div.innerHTML = `<div class="flex justify-between items-center"><input type="text" placeholder="Umfrage-Frage (z.B. Welches Wochenende?)" value="${q}" class="flex-1 p-1.5 text-xs border rounded font-bold poll-question"><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 font-bold px-2 py-1 text-xs ml-2">✕</button></div><input type="text" placeholder="Optionen (Komma-getrennt)" value="${opts}" class="w-full p-1.5 text-xs border rounded poll-options">`;
+            document.getElementById('adminPollsListEditor').appendChild(div);
+        }
+
+        function updateDateRangeString() {
+            let sVal = document.getElementById('adminDateStart').value;
+            let eVal = document.getElementById('adminDateEnd').value;
+            if (sVal && eVal) {
+                let fmt = dtStr => { let parts = dtStr.split('-'); return `${parts[2]}.${parts[1]}.${parts[0]}`; };
+                document.getElementById('adminDatesInput').value = `${fmt(sVal)} - ${fmt(eVal)}`;
             }
         }
 
         async function saveAdminChanges() {
-            if (!curEvent || !appData[curEvent]) return;
-            let nt = document.getElementById('adminTitleInput').value.trim();
-            appData[curEvent].infos = document.getElementById('adminInfosInput').value;
-            appData[curEvent].pollDates = document.getElementById('adminDatesInput').value;
-            appData[curEvent].planner = document.getElementById('transferAdminSelect').value;
-            appData[curEvent].admins = Array.from(document.querySelectorAll('.edit-admin-cb:checked')).map(cb => cb.value);
-
-            let q = document.getElementById('adminPollQuestion').value.trim(); if (q) { appData[curEvent].pollQuestion = q; appData[curEvent].votes = {}; }
-            if (nt && nt !== curEvent) { appData[nt] = appData[curEvent]; delete appData[curEvent]; curEvent = nt; }
+            if (!isUserAdmin(curEvent)) return alert('🔒 Nur Admins!');
+            let d = appData[curEvent], nt = document.getElementById('adminTitleInput').value.trim();
+            d.infos = document.getElementById('adminInfosInput').value; d.pollDates = document.getElementById('adminDatesInput').value;
+            d.planner = document.getElementById('transferAdminSelect').value;
+            d.admins = Array.from(document.querySelectorAll('.edit-admin-cb:checked')).map(cb => cb.value);
+            d.accommodations = Array.from(document.querySelectorAll('.accommodation-row')).map(r => ({ name: r.querySelector('.acc-name').value.trim() || 'Unterkunft', address: r.querySelector('.acc-address').value.trim() })).filter(a => a.address);
+            d.checklist = Array.from(document.querySelectorAll('.checklist-row')).map(r => r.querySelector('.chk-text').value.trim()).filter(t => t);
+            d.polls = Array.from(document.querySelectorAll('.poll-row')).map((r, idx) => ({ question: r.querySelector('.poll-question').value.trim(), options: r.querySelector('.poll-options').value.split(',').map(s => s.trim()).filter(Boolean), votes: d.polls?.[idx]?.votes || {} })).filter(p => p.question && p.options.length);
+            if (nt && nt !== curEvent) { appData[nt] = d; delete appData[curEvent]; curEvent = nt; }
             await save(); renderUI(); alert('💾 Gespeichert!');
         }
 
-        async function votePoll() {
+        async function submitPollVote(pIdx) {
             if (!activeUser) return alert('Name wählen.');
-            if (!appData[curEvent].votes) appData[curEvent].votes = {};
-            appData[curEvent].votes[activeUser] = document.getElementById('pollAnswerSelect').value;
-            await save(); renderUI(); alert('✅ Abgestimmt!');
+            let checkedOpts = Array.from(document.querySelectorAll(`input[name="poll_opt_${pIdx}"]:checked`)).map(cb => cb.value);
+            appData[curEvent].polls[pIdx].votes = appData[curEvent].polls[pIdx].votes || {};
+            appData[curEvent].polls[pIdx].votes[activeUser] = checkedOpts;
+            editingPollsOpenState[pIdx] = false;
+            await save(); renderUI(); alert('✅ Stimmen gespeichert!');
         }
 
-        function changeMonth(d) {
-            calMonth += d; if (calMonth > 11) { calMonth = 0; calYear++; } else if (calMonth < 0) { calMonth = 11; calYear--; }
-            renderCalendar();
+        function togglePollEditState(pIdx) {
+            editingPollsOpenState[pIdx] = !editingPollsOpenState[pIdx];
+            renderUI();
         }
 
-        function parseTripDates(dateStr) {
-            if (!dateStr) return [];
-            let parts = dateStr.split('-').map(s => s.trim());
-            if (parts.length < 2) return [];
-
-            let parseSingle = (str, fallbackYear) => {
-                let p = str.split('.').map(s => s.trim());
-                if (p.length < 2) return null;
-                let day = parseInt(p[0]), month = parseInt(p[1]) - 1;
-                let year = p[2] ? parseInt(p[2]) : fallbackYear;
-                if (isNaN(day) || isNaN(month)) return null;
-                return new Date(year, month, day);
-            };
-
-            let currentYear = new Date().getFullYear();
-            let endDateObj = parseSingle(parts[1], currentYear);
-            let fallbackYear = endDateObj ? endDateObj.getFullYear() : currentYear;
-            let startDateObj = parseSingle(parts[0], fallbackYear);
-
-            if (!startDateObj || !endDateObj || isNaN(startDateObj) || isNaN(endDateObj)) return [];
-
-            let dates = [];
-            let curr = new Date(startDateObj);
-            while (curr <= endDateObj) {
-                dates.push(new Date(curr));
-                curr.setDate(curr.getDate() + 1);
-            }
-            return dates;
-        }
+        function changeMonth(d) { calMonth += d; if (calMonth > 11) { calMonth = 0; calYear++; } else if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
 
         function renderCalendar() {
             document.getElementById('calendarTitle').innerText = `${["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"][calMonth]} ${calYear}`;
-            
-            // Map für Tag -> [Trip-Namen]
-            let tripDaysMap = {}; 
+            let daysMap = {};
             for (let ev in appData) {
-                if (ev === 'meta') continue;
-                let d = appData[ev];
-                if (d.pollDates) {
-                    let dList = parseTripDates(d.pollDates);
-                    dList.forEach(dt => {
-                        let key = `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}`;
-                        if (!tripDaysMap[key]) tripDaysMap[key] = [];
-                        tripDaysMap[key].push(ev);
-                    });
+                if (ev !== 'meta' && appData[ev].pollDates) {
+                    let parts = appData[ev].pollDates.split('-').map(s => s.trim());
+                    if (parts.length >= 2) {
+                        let parseD = str => { let p = str.split('.').map(Number); return (p.length >= 2 && !isNaN(p[0])) ? new Date(p[2]||calYear, p[1]-1, p[0]) : null; };
+                        let sd = parseD(parts[0]), ed = parseD(parts[1]);
+                        if (sd && ed) { let cur = new Date(sd); while (cur <= ed) { daysMap[`${cur.getFullYear()}-${cur.getMonth()}-${cur.getDate()}`] = daysMap[`${cur.getFullYear()}-${cur.getMonth()}-${cur.getDate()}`] || []; daysMap[`${cur.getFullYear()}-${cur.getMonth()}-${cur.getDate()}`].push(ev); cur.setDate(cur.getDate()+1); } }
+                    }
                 }
             }
-
-            let h = '', fd = (new Date(calYear, calMonth, 1).getDay() + 6) % 7, tot = new Date(calYear, calMonth + 1, 0).getDate(), prev = new Date(calYear, calMonth, 0).getDate();
+            let h = '', fd = (new Date(calYear, calMonth, 1).getDay() + 6) % 7, tot = new Date(calYear, calMonth + 1, 0).getDate(), prev = new Date(calYear, calMonth, 0).getDate(), t = new Date();
             for (let i = fd - 1; i >= 0; i--) h += `<span class="py-1 text-gray-300 text-[10px]">${prev - i}</span>`;
-            let t = new Date();
-            
             for (let d = 1; d <= tot; d++) {
                 let isT = (d === t.getDate() && calMonth === t.getMonth() && calYear === t.getFullYear());
-                let tripsOnThisDay = tripDaysMap[`${calYear}-${calMonth}-${d}`];
-
-                let classes = "py-1 rounded-full cursor-pointer relative ";
-                let titleAttr = "";
-                
-                if (tripsOnThisDay && tripsOnThisDay.length > 0) {
-                    classes += "bg-rose-600 text-white font-bold shadow-sm ";
-                    titleAttr = `title="Trip(s): ${tripsOnThisDay.join(', ')}"`;
-                } else if (isT) {
-                    classes += "bg-teal-700 text-white font-bold ";
-                } else {
-                    classes += "hover:bg-gray-100 ";
-                }
-                h += `<span class="${classes}" ${titleAttr}>${d}</span>`;
+                let trips = daysMap[`${calYear}-${calMonth}-${d}`];
+                let cls = "py-1 rounded-full cursor-pointer relative ";
+                if (trips) cls += "bg-rose-600 text-white font-bold";
+                else if (isT) cls += "bg-teal-700 text-white font-bold";
+                else cls += "hover:bg-gray-100";
+                h += `<span class="${cls}" ${trips?`title="Trip: ${trips.join(', ')}"`:''}>${d}</span>`;
             }
             document.getElementById('calendarDays').innerHTML = h;
         }
 
         function openHistoryModal() {
             let evs = Object.keys(appData).filter(k => k !== 'meta').sort((a, b) => appData[b].createdAt - appData[a].createdAt);
-            let archivedEvs = evs.filter(e => {
-                let d = appData[e], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false);
-                return isArchived(d, ae);
-            });
-
-            document.getElementById('historyListContent').innerHTML = archivedEvs.length === 0 ? '<p class="text-xs text-gray-400 italic">Keine archivierten Trips.</p>' : archivedEvs.map(e => {
-                return `<div class="flex items-center justify-between p-2.5 rounded text-xs border bg-gray-50 hover:bg-gray-100 cursor-pointer" onclick="toggleModal('historyModal',false);openTripDashboard('${e}');"><span>📁 ${e}</span><div class="flex items-center gap-2"><span class="text-[9px] bg-gray-200 px-1.5 py-0.5 rounded font-bold">Archiv</span><button onclick="deleteSpecificTrip('${e}', event)" class="text-red-500 hover:text-red-700 font-bold px-1.5 py-0.5 text-xs">✕</button></div></div>`;
-            }).join('');
+            let arch = evs.filter(e => isArchived(appData[e], Object.entries(appData[e].members||{}).filter(([_,m])=>m.active!==false)));
+            document.getElementById('historyListContent').innerHTML = arch.length === 0 ? '<p class="text-xs text-gray-400 italic">Keine.</p>' : arch.map(e => `<div class="flex items-center justify-between p-2.5 rounded text-xs border bg-gray-50 cursor-pointer" onclick="toggleModal('historyModal',false);openTripDashboard('${e}');"><span>📁 ${e}</span>${isUserAdmin(e)?`<button onclick="deleteSpecificTrip('${e}', event)" class="text-red-500 font-bold px-1.5 py-0.5 text-xs">✕</button>`:''}</div>`).join('');
             toggleModal('historyModal', true);
         }
 
         function openActiveTripsModal() {
             let evs = Object.keys(appData).filter(k => k !== 'meta').sort((a, b) => appData[b].createdAt - appData[a].createdAt);
-            let activeEvs = evs.filter(e => {
-                let d = appData[e], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false);
-                return !isArchived(d, ae);
-            });
-
-            document.getElementById('activeTripsListContent').innerHTML = activeEvs.length === 0 ? '<p class="text-xs text-gray-400 italic">Keine offenen Trips.</p>' : activeEvs.map(e => {
-                let dInfo = appData[e].pollDates ? ` (${appData[e].pollDates})` : '';
-                return `<div class="flex items-center justify-between p-2.5 rounded text-xs border bg-teal-50 hover:bg-teal-100 text-teal-900 font-bold cursor-pointer" onclick="toggleModal('activeTripsModal',false);openTripDashboard('${e}');"><span>🚀 ${e} <span class="font-normal text-[10px] text-teal-700">${dInfo}</span></span><div class="flex items-center gap-2"><span class="text-[9px] bg-teal-200 px-1.5 py-0.5 rounded">Offen</span><button onclick="deleteSpecificTrip('${e}', event)" class="text-red-500 hover:text-red-700 font-bold px-1.5 py-0.5 text-xs">✕</button></div></div>`;
+            let act = evs.filter(e => !isArchived(appData[e], Object.entries(appData[e].members||{}).filter(([_,m])=>m.active!==false)));
+            document.getElementById('activeTripsListContent').innerHTML = act.length === 0 ? '<p class="text-xs text-gray-400 italic">Keine.</p>' : act.map(e => {
+                let unread = getUnread(e, 'total');
+                return `<div class="flex items-center justify-between p-2.5 rounded text-xs border bg-teal-50 cursor-pointer font-bold text-teal-900" onclick="toggleModal('activeTripsModal',false);openTripDashboard('${e}');"><span>🚀 ${e}</span><div class="flex items-center gap-2">${unread>0?`<span class="bg-rose-600 text-white text-[9px] px-1.5 py-0.2 rounded-full">${unread}</span>`:''}${isUserAdmin(e)?`<button onclick="deleteSpecificTrip('${e}', event)" class="text-red-500 font-bold px-1.5 py-0.5 text-xs">✕</button>`:''}</div></div>`;
             }).join('');
             toggleModal('activeTripsModal', true);
         }
 
-        async function toggleMemberActive(n) { let m = appData[curEvent].members[n]; if (m) { m.active = m.active === false ? true : false; await save(); renderUI(); } }
-        function selectUser(n) { activeUser = n; localStorage.setItem('syoufActiveUser', activeUser); toggleModal('userModal', false); renderUI(); }
+        async function toggleMemberActive(n) {
+            if (!isUserAdmin(curEvent)) return alert('🔒 Nur Admins dürfen Teilnehmer aktivieren/deaktivieren!');
+            appData[curEvent].members[n].active = !appData[curEvent].members[n].active;
+            await save(); renderUI();
+        }
 
-        function openUserModalManual() {
-            let gmList = Object.keys(appData.meta.globalMembers || {});
-            document.getElementById('modalUserList').innerHTML = gmList.length === 0 ? '<p class="text-xs text-gray-500 mb-2">Noch keine Mitglieder da. Leg direkt eins an:</p>' : gmList.map(m => `<button onclick="selectUser('${m}')" class="w-full py-2 bg-teal-50 font-semibold rounded text-xs" style="color:${getUsernameColor(m)}">${m}</button>`).join('');
+        function selectUser(n) { activeUser = n; localStorage.setItem('syoufActiveUser', activeUser); toggleModal('userModal', false); renderUI(); }
+        function openUserModal() {
+            let gm = appData.meta.globalMembers || {};
+            document.getElementById('modalUserList').innerHTML = Object.keys(gm).length === 0 ? '<p class="text-xs text-gray-500 mb-2">Keine Mitglieder.</p>' : Object.keys(gm).map(m => `<button onclick="selectUser('${m}')" class="w-full py-2 bg-teal-50 font-semibold rounded text-xs" style="color:${getUsernameColor(m)}">${m}</button>`).join('');
             toggleModal('userModal', true);
         }
 
         async function toggleReady() { let m = appData[curEvent].members[activeUser]; if (m) { m.ready = !m.ready; await save(); renderUI(); } }
-        function openPayPalModal() { document.getElementById('paypalInput').value = appData.meta.globalMembers[activeUser]?.paypal || ''; toggleModal('paypalModal', true); }
-
-        async function savePayPalLink() {
-            let v = document.getElementById('paypalInput').value.trim().replace(/^https?:\/\/(www\.)?paypal\.me\//i, '').replace(/^\//, '');
-            if (activeUser) {
-                if (!appData.meta.globalMembers) appData.meta.globalMembers = {};
-                if (!appData.meta.globalMembers[activeUser]) appData.meta.globalMembers[activeUser] = {};
-                appData.meta.globalMembers[activeUser].paypal = v;
-                for (let ev in appData) if (ev !== 'meta' && appData[ev].members[activeUser]) appData[ev].members[activeUser].paypal = v;
-                await save(); toggleModal('paypalModal', false); renderUI();
-            }
-        }
 
         async function saveExpense() {
             let d = appData[curEvent], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false); if (isArchived(d, ae)) return alert('🔒 Archiviert.');
             let desc = document.getElementById('expenseDesc').value.trim(), raw = parseFloat(document.getElementById('expenseAmount').value), cur = document.getElementById('expenseCurrency').value, dateVal = document.getElementById('expenseDate').value, payer = document.getElementById('expensePayer').value, editIdx = parseInt(document.getElementById('editIndex').value), parts = Array.from(document.querySelectorAll('input[name="participant"]:checked')).map(cb => cb.value);
             if (!desc || isNaN(raw) || raw <= 0 || !payer || parts.length === 0) return alert('Alle Felder füllen!');
-            let amt = raw; if (cur !== 'EUR') { try { let res = await fetch(`https://api.frankfurter.app/latest?amount=${raw}&from=${cur}&to=EUR`), j = await res.json(); if (j?.rates?.EUR) amt = j.rates.EUR; } catch (e) { } }
+            let amt = raw; if (cur !== 'EUR') { try { let res = await fetch(`https://api.frankfurter.app/latest?amount=${raw}&from=${cur}&to=EUR`), j = await res.json(); if (j?.rates?.EUR) amt = j.rates.EUR; } catch(e){} }
             let entry = { desc, amount: amt, originalAmount: raw !== amt ? raw : null, originalCurrency: raw !== amt ? cur : null, date: dateVal || getTodayIso(), payer, participants: parts, createdBy: activeUser || 'Unbekannt' };
-            if (editIdx === -1) appData[curEvent].expenses.push(entry); else appData[curEvent].expenses[editIdx] = entry;
-            if (isArchived(appData[curEvent], ae)) appData[curEvent].images = [];
+            if (editIdx === -1) d.expenses.push(entry); else d.expenses[editIdx] = entry;
             await save(); resetForm(); renderUI();
         }
 
         function editExpense(i) {
             let d = appData[curEvent], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false); if (isArchived(d, ae)) return alert('🔒 Archiviert.');
-            let e = d.expenses[i]; 
-            document.getElementById('expenseDesc').value = e.desc; 
-            document.getElementById('expenseAmount').value = e.originalAmount || e.amount; 
-            document.getElementById('expenseCurrency').value = e.originalCurrency || 'EUR'; 
-            document.getElementById('expenseDate').value = e.date || getTodayIso();
-            document.getElementById('expensePayer').value = e.payer; 
-            document.getElementById('editIndex').value = i;
-            document.getElementById('saveExpenseBtn').innerText = 'Speichern'; 
-            document.getElementById('cancelEditBtn').classList.remove('hidden'); 
-            document.getElementById('expenseFormTitle').innerText = 'Ausgabe bearbeiten';
+            let e = d.expenses[i]; if (e.payer !== activeUser && !isUserAdmin(curEvent)) return alert('🔒 Nur eigene Ausgaben!');
+            document.getElementById('expenseDesc').value = e.desc; document.getElementById('expenseAmount').value = e.originalAmount || e.amount; document.getElementById('expenseCurrency').value = e.originalCurrency || 'EUR'; document.getElementById('expenseDate').value = e.date || getTodayIso(); document.getElementById('expensePayer').value = e.payer; document.getElementById('editIndex').value = i;
+            document.getElementById('saveExpenseBtn').innerText = 'Speichern'; document.getElementById('cancelEditBtn').classList.remove('hidden'); document.getElementById('expenseFormTitle').innerText = 'Ausgabe bearbeiten';
             renderCheckboxes(e.participants); switchTab('mine');
         }
 
         function resetForm() {
-            document.getElementById('expenseDesc').value = ''; 
-            document.getElementById('expenseAmount').value = ''; 
-            document.getElementById('expenseCurrency').value = 'EUR'; 
-            document.getElementById('expenseDate').value = getTodayIso();
-            document.getElementById('editIndex').value = '-1';
-            document.getElementById('saveExpenseBtn').innerText = 'Hinzufügen'; 
-            document.getElementById('cancelEditBtn').classList.add('hidden'); 
-            document.getElementById('expenseFormTitle').innerText = 'Ausgabe eintragen';
+            document.getElementById('expenseDesc').value = ''; document.getElementById('expenseAmount').value = ''; document.getElementById('expenseCurrency').value = 'EUR'; document.getElementById('expenseDate').value = getTodayIso(); document.getElementById('editIndex').value = '-1';
+            document.getElementById('saveExpenseBtn').innerText = 'Hinzufügen'; document.getElementById('cancelEditBtn').classList.add('hidden'); document.getElementById('expenseFormTitle').innerText = 'Ausgabe eintragen';
             renderCheckboxes();
         }
 
         async function deleteExpense(i) {
             let d = appData[curEvent], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false); if (isArchived(d, ae)) return alert('🔒 Archiviert.');
-            if (confirm('Löschen?')) { appData[curEvent].expenses.splice(i, 1); await save(); renderUI(); }
+            if (d.expenses[i].payer !== activeUser && !isUserAdmin(curEvent)) return alert('🔒 Nur Admins oder Ersteller!');
+            if (confirm('Löschen?')) { d.expenses.splice(i, 1); await save(); renderUI(); }
         }
 
         async function settleDebt(from, to, amount, allowed) {
-            if (!allowed) return alert("🔒 Warten, bis alle Mitglieder oben auf 'Fertig ✓' geklickt haben!");
-            
-            if (confirm(`Ausgleich von ${from} an ${to} verbuchen (${amount.toFixed(2)} €)? Kassenstand wird ausgeglichen.`)) {
-                appData[curEvent].expenses.push({ 
-                    desc: `💸 Ausgleich: ${from} an ${to}`, 
-                    amount: amount, 
-                    date: getTodayIso(),
-                    payer: from, 
-                    participants: [to], 
-                    createdBy: activeUser || 'Unbekannt' 
-                });
-
+            if (!allowed) return alert("🔒 Warten, bis alle Mitglieder bereit sind!");
+            if (confirm(`Ausgleich von ${from} an ${to} (${amount.toFixed(2)} €)?`)) {
+                appData[curEvent].expenses.push({ desc: `💸 Ausgleich: ${from} an ${to}`, amount, date: getTodayIso(), payer: from, participants: [to], createdBy: activeUser || 'Unbekannt' });
                 let d = appData[curEvent], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false);
-                if (isArchived(d, ae)) { 
-                    d.images = []; 
-                    alert('🎉 Alle Rechnungen beglichen! Der Trip ist nun im Archiv beendet.'); 
-                } else {
-                    alert('✅ Erfolgreich beglichen! Kassenstand wurde angepasst.');
-                }
-
-                await save(); 
-                renderUI();
+                if (isArchived(d, ae)) { alert('🎉 Alle Rechnungen beglichen! Trip ist im Archiv.'); } else { alert('✅ Beglichen!'); }
+                await save(); renderUI();
             }
         }
 
         const toggleAllParticipants = sel => document.querySelectorAll('input[name="participant"]').forEach(cb => cb.checked = sel);
-
         function renderCheckboxes(sel = null) {
             if (!curEvent || !appData[curEvent]) return;
             let am = Object.keys(appData[curEvent].members || {}).filter(m => appData[curEvent].members[m].active !== false), chk = sel ? new Set(sel) : new Set(am);
-            document.getElementById('splitParticipants').innerHTML = am.length === 0 ? '<span class="text-xs text-gray-400">Keine.</span>' : am.map(m => `<label class="flex items-center gap-1.5 text-xs bg-gray-100 px-2.5 py-1 rounded cursor-pointer"><input type="checkbox" name="participant" value="${m}" ${chk.has(m) ? 'checked' : ''} class="geohammer-checkbox"><span style="color:${getUsernameColor(m)};font-weight:bold">${m}</span></label>`).join('');
+            document.getElementById('splitParticipants').innerHTML = am.length === 0 ? '<span class="text-xs text-gray-400">Keine.</span>' : am.map(m => `<label class="flex items-center gap-1.5 text-xs bg-gray-100 px-2.5 py-1 rounded cursor-pointer"><input type="checkbox" name="participant" value="${m}" ${chk.has(m)?'checked':''} class="geohammer-checkbox"><span style="color:${getUsernameColor(m)};font-weight:bold">${m}</span></label>`).join('');
         }
 
         function renderUI() {
+            let gmListObj = appData.meta.globalMembers || {};
+            document.getElementById('globalMemberList').innerHTML = Object.keys(gmListObj).length === 0 ? '<span class="text-[11px] text-gray-400 italic">Keine Mitglieder vorhanden.</span>' : Object.keys(gmListObj).map(m => `<button onclick="selectUser('${m}')" class="inline-flex items-center gap-1 bg-white border px-2.5 py-1 rounded text-xs font-semibold shadow-sm hover:bg-teal-50 cursor-pointer" style="color:${getUsernameColor(m)}">${m} <span onclick="event.stopPropagation(); deleteGlobalMember('${m}')" class="text-red-500 ml-1 text-[10px]">✕</span></button>`).join('');
+
             let evs = Object.keys(appData).filter(k => k !== 'meta').sort((a, b) => appData[b].createdAt - appData[a].createdAt);
-            document.getElementById('plannerStatusDisplay').innerHTML = `Bereit für neue Trips.`;
-
-            let gmList = appData.meta.globalMembers || {};
-            document.getElementById('globalMemberList').innerHTML = Object.keys(gmList).length === 0 ? '<span class="text-[11px] text-gray-400 italic">Keine Mitglieder.</span>' : Object.keys(gmList).map(m => `<span class="inline-flex items-center gap-1 bg-white border px-2 py-1 rounded text-xs font-semibold shadow-sm" style="color:${getUsernameColor(m)}">${m}<button onclick="deleteGlobalMember('${m}')" class="text-red-500 ml-1 text-[10px]">✕</button></span>`).join('');
-
-            let activeEvs = evs.filter(e => {
-                let d = appData[e], ae = Object.entries(d.members || {}).filter(([_, m]) => m.active !== false);
-                return !isArchived(d, ae);
-            });
+            let activeEvs = evs.filter(e => !isArchived(appData[e], Object.entries(appData[e].members||{}).filter(([_,m])=>m.active!==false)));
+            let homeBadgeEl = document.getElementById('homeBadgeContainer');
             if (activeEvs.length > 0) {
-                document.getElementById('upcomingTripName').innerText = activeEvs[0];
-                let activeDates = appData[activeEvs[0]].pollDates;
-                document.getElementById('upcomingTripDatesSub').innerText = activeDates ? `📅 ${activeDates}` : "";
+                let top = activeEvs[0];
+                document.getElementById('upcomingTripName').innerText = top;
+                document.getElementById('upcomingTripDatesSub').innerText = appData[top].pollDates ? `📅 ${appData[top].pollDates}` : "";
+                let unread = getUnread(top, 'total');
+                if (unread > 0) { homeBadgeEl.innerHTML = `<span class="bg-rose-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow">${unread}</span>`; homeBadgeEl.classList.remove('hidden'); } else homeBadgeEl.classList.add('hidden');
             } else {
-                document.getElementById('upcomingTripName').innerText = "Keiner";
-                document.getElementById('upcomingTripDatesSub').innerText = "";
+                document.getElementById('upcomingTripName').innerText = "Keiner"; document.getElementById('upcomingTripDatesSub').innerText = ""; homeBadgeEl.classList.add('hidden');
             }
 
-            let archivedEvs = evs.filter(e => {
-                let ed = appData[e], eat = Object.entries(ed.members || {}).filter(([_, m]) => m.active !== false);
-                return isArchived(ed, eat);
-            });
-            if (archivedEvs.length > 0) {
-                document.getElementById('lastArchivedTripName').innerText = archivedEvs[0];
-            } else {
-                document.getElementById('lastArchivedTripName').innerText = "Keines";
-            }
+            let archEvs = evs.filter(e => isArchived(appData[e], Object.entries(appData[e].members||{}).filter(([_,m])=>m.active!==false)));
+            document.getElementById('lastArchivedTripName').innerText = archEvs.length > 0 ? archEvs[0] : "Keines";
 
             let ue = new URLSearchParams(window.location.search).get('event'), uv = new URLSearchParams(window.location.search).get('view');
             if (ue && appData[ue]) curEvent = ue; if (uv) viewMode = uv;
 
             if (!curEvent || !appData[curEvent]) {
-                document.getElementById('viewDashboard').classList.remove('hidden');
-                document.getElementById('viewTripDashboard').classList.add('hidden');
-                document.getElementById('viewSplitMoney').classList.add('hidden');
+                document.getElementById('viewDashboard').classList.remove('hidden'); document.getElementById('viewTripDashboard').classList.add('hidden'); document.getElementById('viewSplitMoney').classList.add('hidden');
                 renderCalendar();
             } else {
-                let d = appData[curEvent], ents = Object.entries(d.members || {}), aes = ents.filter(([_, m]) => m.active !== false), allR = aes.length > 0 && aes.every(([_, m]) => m.ready), arch = isArchived(d, aes);
-                let admins = d.admins || [];
+                let d = appData[curEvent], ents = Object.entries(d.members || {}), aes = ents.filter(([_, m]) => m.active !== false);
+                let allR = aes.length > 0 && aes.every(([_, m]) => m.ready), arch = isArchived(d, aes), isAdmin = isUserAdmin(curEvent);
 
-                let headerClass = arch ? "flex justify-between items-center bg-gray-700 text-white p-3 rounded-xl" : "flex justify-between items-center bg-teal-900 text-white p-3 rounded-xl";
-                document.getElementById('tripHeaderBox').className = headerClass;
-                document.getElementById('tripHeaderSub').innerText = arch ? "Archiv (Beendet)" : "Reisezentrale";
-                document.getElementById('moneyHeaderBox').className = headerClass;
-                document.getElementById('moneyHeaderSub').innerText = arch ? "Kasse (Archiv)" : "Kasse";
+                document.getElementById('tripHeaderSub').innerText = arch ? "Archiv" : (isAdmin ? "Zentrale (Admin)" : "Zentrale");
 
                 if (viewMode === 'dashboard') {
-                    document.getElementById('viewDashboard').classList.add('hidden');
-                    document.getElementById('viewTripDashboard').classList.remove('hidden');
-                    document.getElementById('viewSplitMoney').classList.add('hidden');
+                    document.getElementById('viewDashboard').classList.add('hidden'); document.getElementById('viewTripDashboard').classList.remove('hidden'); document.getElementById('viewSplitMoney').classList.add('hidden');
                     document.getElementById('tripDashboardTitle').innerText = curEvent;
                     document.getElementById('tripDashboardPlanner').innerHTML = `👑 Planer: <span style="color:${getUsernameColor(d.planner)};font-weight:bold">${d.planner || 'Offen'}</span>`;
                     
                     let admCont = document.getElementById('tripDashboardAdminsContainer');
-                    let admListEl = document.getElementById('tripDashboardAdminsList');
-                    if (admins.length > 0) {
-                        admCont.classList.remove('hidden');
-                        admListEl.innerHTML = admins.map(a => `<span style="color:${getUsernameColor(a)};font-weight:bold">${a}</span>`).join(', ');
+                    if (d.admins?.length > 0) { admCont.classList.remove('hidden'); document.getElementById('tripDashboardAdminsList').innerHTML = d.admins.map(a => `<span style="color:${getUsernameColor(a)};font-weight:bold">${a}</span>`).join(', '); } else admCont.classList.add('hidden');
+                    document.getElementById('tripDashboardDates').innerText = d.pollDates ? `📅 ${d.pollDates}` : "Termin offen";
+                    
+                    document.getElementById('tripDashboardInfos').innerHTML = d.infos ? d.infos.replace(/\n/g, '<br>') : 'Keine Infos.';
+                    document.getElementById('tripDashboardAccommodations').innerHTML = (d.accommodations || []).length ? d.accommodations.map(acc => `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(acc.address)}" target="_blank" class="block bg-white p-2.5 rounded-lg border border-teal-200 hover:bg-teal-50 shadow-sm"><div class="font-bold text-teal-900">🏨 ${acc.name}</div><div class="text-teal-700 underline text-[11px] mt-0.5">📍 ${acc.address}</div></a>`).join('') : '<div class="text-gray-400 italic bg-white p-2.5 rounded-lg border">Keine Unterkünfte.</div>';
+                    document.getElementById('tripDashboardChecklist').innerHTML = (d.checklist || []).length ? `<ul class="list-disc pl-4 space-y-1 bg-white p-2.5 rounded-lg border">${d.checklist.map(i => `<li>${i}</li>`).join('')}</ul>` : '<div class="text-gray-400 italic bg-white p-2.5 rounded-lg border">Keine Punkte.</div>';
+
+                    // Umfragen & Diagramm rendern
+                    let pollsContainer = document.getElementById('tripDashboardPollsContainer');
+                    let polls = d.polls || [];
+                    if (polls.length > 0) {
+                        let totalVotersCount = aes.length;
+                        pollsContainer.innerHTML = polls.map((p, pIdx) => {
+                            let votes = p.votes || {}, userSelected = activeUser ? (votes[activeUser] || []) : [];
+                            let hasVoted = userSelected.length > 0;
+                            let isEditing = editingPollsOpenState[pIdx] || !hasVoted;
+
+                            let counts = {}; p.options.forEach(opt => counts[opt] = 0);
+                            Object.values(votes).forEach(selectedOpts => { if (Array.isArray(selectedOpts)) selectedOpts.forEach(opt => { if (counts[opt] !== undefined) counts[opt]++; }); });
+                            let maxVotes = Math.max(...Object.values(counts), 1);
+
+                            let optionsCheckboxes = p.options.map(opt => `<label class="flex items-center gap-2 text-xs cursor-pointer py-1"><input type="checkbox" name="poll_opt_${pIdx}" value="${opt}" ${userSelected.includes(opt)?'checked':''} class="geohammer-checkbox"> <span>${opt}</span></label>`).join('');
+                            
+                            let chartHtml = p.options.map(opt => {
+                                let cnt = counts[opt], pct = totalVotersCount > 0 ? Math.round((cnt / totalVotersCount) * 100) : 0, barWidth = Math.round((cnt / maxVotes) * 100);
+                                return `<div class="space-y-1"><div class="flex justify-between text-[11px] font-semibold text-gray-700"><span>${opt}</span><span>${cnt} Stimme(n) (${pct}%)</span></div><div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden border border-gray-200"><div class="bg-teal-600 h-2.5 rounded-full transition-all duration-500" style="width: ${barWidth}%"></div></div></div>`;
+                            }).join('');
+                            
+                            let detailsHtml = Object.keys(votes).length === 0 ? '<span class="text-gray-400 italic text-[11px]">Noch keine Stimmen.</span>' : Object.entries(votes).map(([u, opts]) => `<div class="text-[11px]"><span style="color:${getUsernameColor(u)}; font-weight:bold">${u}:</span> ${Array.isArray(opts)&&opts.length?opts.join(', '):'Nichts'}</div>`).join('');
+
+                            let votingSection = isEditing ? `
+                                <div class="space-y-1 py-1 border-t border-b border-gray-100">
+                                    <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">Deine Auswahl ankreuzen:</div>
+                                    ${optionsCheckboxes}
+                                </div>
+                                <button type="button" onclick="submitPollVote(${pIdx})" class="bg-teal-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow w-full">Stimmen abschicken</button>
+                            ` : `
+                                <div class="flex justify-between items-center bg-teal-50 p-2 rounded border border-teal-200 text-xs">
+                                    <span>✅ So hast du abgestimmt: <b>${userSelected.join(', ')}</b></span>
+                                    <button onclick="togglePollEditState(${pIdx})" class="bg-white border text-teal-800 px-2 py-1 rounded font-bold text-[10px]">Ändern</button>
+                                </div>
+                            `;
+
+                            return `<div class="bg-white p-3 rounded-lg border border-teal-200 space-y-3"><div class="font-bold text-teal-900 text-sm">📊 ${p.question}</div>${votingSection}<div class="mt-3 pt-3 border-t space-y-2"><div class="text-[11px] font-bold text-teal-900 uppercase">📈 Auswertungsdiagramm:</div><div class="space-y-2 bg-gray-50 p-2.5 rounded border">${chartHtml}</div></div><div class="mt-2 pt-2 border-t bg-gray-50 p-2 rounded"><div class="text-[10px] font-bold text-gray-500 uppercase mb-1">Wer hat was gewählt:</div><div class="space-y-0.5">${detailsHtml}</div></div></div>`;
+                        }).join('');
                     } else {
-                        admCont.classList.add('hidden');
+                        pollsContainer.innerHTML = '<div class="text-gray-400 italic bg-white p-2.5 rounded-lg border">Keine Umfragen.</div>';
                     }
 
-                    document.getElementById('tripDashboardDates').innerText = d.pollDates ? `📅 ${d.pollDates}` : "Termin offen";
-                    document.getElementById('tripDashboardInfos').innerHTML = d.infos ? d.infos.replace(/\n/g, '<br>') : 'Keine Infos.';
+                    // Feingranulare Badges für Unter-Reiter
+                    let uInfos = getUnread(curEvent, 'infos');
+                    let badgeInfos = document.getElementById('badgeInfos');
+                    if (uInfos > 0) { badgeInfos.innerText = uInfos; badgeInfos.classList.remove('hidden'); } else badgeInfos.classList.add('hidden');
 
-                    document.getElementById('tripDashboardMemberList').innerHTML = ents.length === 0 ? '<span class="text-[11px] text-gray-400 italic">Keine Mitglieder.</span>' : ents.map(([name, m]) => `<button onclick="toggleMemberActive('${name}')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold border ${m.active !== false ? 'bg-white text-teal-900 border-teal-200' : 'bg-gray-100 text-gray-400 line-through border-gray-300'}" style="${m.active !== false ? 'color:' + getUsernameColor(name) : ''}">${m.active !== false ? '✅' : '❌'} ${name}</button>`).join('');
+                    let uAcc = getUnread(curEvent, 'accommodations');
+                    let badgeAcc = document.getElementById('badgeAccommodations');
+                    if (uAcc > 0) { badgeAcc.innerText = uAcc; badgeAcc.classList.remove('hidden'); } else badgeAcc.classList.add('hidden');
 
-                    let ic = document.getElementById('tripImageContainer'), idisp = document.getElementById('tripImageDisplay'), noim = document.getElementById('noImagesText');
-                    if (d.images?.length > 0) { idisp.innerHTML = d.images.map(img => `<div class="relative"><img src="${img.url}" class="w-full h-28 object-cover rounded border"><span class="absolute bottom-1 left-1 bg-black/70 text-[9px] px-1 rounded font-bold" style="color:${getUsernameColor(img.by)}">${img.by}</span></div>`).join(''); ic.classList.remove('hidden'); noim.classList.add('hidden'); } else { ic.classList.add('hidden'); noim.classList.remove('hidden'); }
+                    let uTravel = getUnread(curEvent, 'travel');
+                    let badgeTravel = document.getElementById('badgeTravel');
+                    if (uTravel > 0) { badgeTravel.innerText = uTravel; badgeTravel.classList.remove('hidden'); } else badgeTravel.classList.add('hidden');
 
-                    let ps = document.getElementById('tripDashboardPollSec');
-                    if (d.pollQuestion) {
-                        ps.classList.remove('hidden'); document.getElementById('pollQuestionText').innerText = `📊 ${d.pollQuestion}`;
-                        let votes = d.votes || {}; document.getElementById('pollVotesList').innerHTML = Object.keys(votes).length === 0 ? '<span class="text-gray-400 italic">Keine.</span>' : Object.entries(votes).map(([u, a]) => `<div><span style="color:${getUsernameColor(u)};font-weight:bold">${u}:</span> ${a}</div>`).join('');
-                    } else { ps.classList.add('hidden'); }
+                    // Teilnehmer-Dropdown befüllen
+                    document.getElementById('participantCountLabel').innerText = ents.length;
+                    document.getElementById('tripDashboardMemberList').innerHTML = ents.length === 0 ? '<span class="text-[11px] text-gray-400 italic">Keine.</span>' : ents.map(([name, m]) => {
+                        if (isAdmin && !arch) {
+                            return `<button onclick="toggleMemberActive('${name}')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold border ${m.active!==false?'bg-white text-teal-900 border-teal-200':'bg-gray-100 text-gray-400 line-through border-gray-300'}" style="${m.active!==false?'color:'+getUsernameColor(name):''}">${m.active!==false?'✅':'❌'} ${name}</button>`;
+                        } else {
+                            if (m.active === false) return '';
+                            return `<span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold border bg-white border-teal-200" style="color:${getUsernameColor(name)}">${name}</span>`;
+                        }
+                    }).join('');
 
-                    document.getElementById('arrivalList').innerHTML = Object.keys(d.arrivals || {}).length === 0 ? '<span class="text-gray-400 italic">Keine.</span>' : Object.entries(d.arrivals).map(([u, t]) => `<div>✈️ <span style="color:${getUsernameColor(u)};font-weight:bold">${u}:</span> ${t}</div>`).join('');
+                    document.getElementById('adminParticipantControls').classList.toggle('hidden', !(isAdmin && !arch));
+                    document.getElementById('mainRoleTabContainer').classList.toggle('hidden', !isAdmin || arch);
 
-                    let aeArea = document.getElementById('adminEditArea'); 
-                    aeArea.classList.toggle('hidden', arch);
+                    document.getElementById('arrivalList').innerHTML = Object.keys(d.arrivals || {}).length === 0 ? '<span class="text-gray-400 italic">Keine.</span>' : Object.entries(d.arrivals).map(([u, t]) => `<div>🚗 <span style="color:${getUsernameColor(u)};font-weight:bold">${u}:</span> ${t}</div>`).join('');
+
+                    let mUnread = getUnread(curEvent, 'money');
+                    let moneyBadgeContainer = document.getElementById('moneySplitBadgeContainer');
+                    if (mUnread > 0) { moneyBadgeContainer.innerHTML = `<span class="bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full font-bold shadow-lg">${mUnread}</span>`; moneyBadgeContainer.classList.remove('hidden'); } else moneyBadgeContainer.classList.add('hidden');
+
+                    document.getElementById('deleteTripBtn').classList.toggle('hidden', !(isAdmin && !arch));
                     
-                    document.getElementById('adminTitleInput').value = curEvent;
-                    document.getElementById('adminInfosInput').value = d.infos || '';
+                    document.getElementById('adminTitleInput').value = curEvent; 
+                    document.getElementById('adminInfosInput').value = d.infos || ''; 
                     document.getElementById('adminDatesInput').value = d.pollDates || '';
                     
+                    let accEd = document.getElementById('adminAccommodationsListEditor'); accEd.innerHTML = ''; (d.accommodations || []).forEach(a => addAccommodationField(a.name, a.address));
+                    let chkEd = document.getElementById('adminChecklistEditor'); chkEd.innerHTML = ''; (d.checklist || []).forEach(i => addChecklistItemField(i));
+                    let pollEd = document.getElementById('adminPollsListEditor'); pollEd.innerHTML = ''; (d.polls || []).forEach(p => addPollField(p.question, p.options.join(', ')));
+
                     let gmList = Object.keys(appData.meta.globalMembers || {});
                     document.getElementById('transferAdminSelect').innerHTML = gmList.map(n => `<option value="${n}" ${d.planner === n ? 'selected' : ''}>${n}</option>`).join('');
-                    
-                    document.getElementById('adminCheckboxesContainer').innerHTML = gmList.map(n => `<label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" value="${n}" ${(d.admins || []).includes(n) ? 'checked' : ''} class="edit-admin-cb geohammer-checkbox"><span>${n}</span></label>`).join('');
+                    document.getElementById('adminCountLabel').innerText = (d.admins || []).length;
+                    document.getElementById('adminCheckboxesContainer').innerHTML = gmList.map(n => `<label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" value="${n}" ${(d.admins || []).includes(n)?'checked':''} class="edit-admin-cb geohammer-checkbox"><span>${n}</span></label>`).join('');
 
                 } else {
-                    document.getElementById('viewDashboard').classList.add('hidden');
-                    document.getElementById('viewTripDashboard').classList.add('hidden');
-                    document.getElementById('viewSplitMoney').classList.remove('hidden');
+                    document.getElementById('viewDashboard').classList.add('hidden'); document.getElementById('viewTripDashboard').classList.add('hidden'); document.getElementById('viewSplitMoney').classList.remove('hidden');
                     document.getElementById('activeTripTitle').innerText = curEvent;
-                    document.getElementById('settlementInfoText').innerText = arch ? "🔒 Alle Rechnungen beglichen – Trip im Archiv!" : (allR ? "✨ Abrechnung frei! Begleiche offene Rechnungen." : "⏳ Warten, bis alle Mitglieder auf 'Fertig' geklickt haben...");
+                    document.getElementById('settlementInfoText').innerText = arch ? "🔒 Im Archiv!" : (allR ? "✨ Abrechnung frei!" : "⏳ Warten auf alle Mitglieder...");
 
-                    document.getElementById('memberList').innerHTML = ents.length === 0 ? '<p class="text-xs text-gray-400">Keine Mitglieder.</p>' : ents.map(([name, m]) => `<div class="flex justify-between items-center bg-white px-3 py-2 rounded text-xs border ${m.active !== false ? '' : 'opacity-40 bg-gray-50'}"><span class="font-semibold ${m.active !== false ? '' : 'line-through'}" style="color:${getUsernameColor(name)}">${name}</span><span class="px-2 py-0.5 rounded font-medium border ${m.ready ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${m.ready ? '✓ Fertig' : '⏳'}</span></div>`).join('');
+                    document.getElementById('moneyParticipantCountLabel').innerText = ents.length;
+                    document.getElementById('memberList').innerHTML = ents.length === 0 ? '<p class="text-xs text-gray-400">Keine.</p>' : ents.map(([name, m]) => `<div class="flex justify-between items-center bg-white px-3 py-2 rounded text-xs border ${m.active!==false?'':'opacity-40 bg-gray-50'}"><span class="font-semibold ${m.active!==false?'':'line-through'}" style="color:${getUsernameColor(name)}">${name}</span><span class="px-2 py-0.5 rounded font-medium border ${m.ready?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}">${m.ready?'✓ Eingetragen':'⏳'}</span></div>`).join('');
+
+                    let allTabBadge = document.getElementById('allTabBadge');
+                    let mUnreadAll = getUnread(curEvent, 'money');
+                    if (mUnreadAll > 0) { allTabBadge.innerText = mUnreadAll; allTabBadge.classList.remove('hidden'); } else allTabBadge.classList.add('hidden');
 
                     let rBtn = document.getElementById('toggleReadyBtn');
                     if (activeUser && d.members?.[activeUser]?.active !== false && !arch) {
-                        rBtn.classList.remove('hidden'); rBtn.innerText = d.members[activeUser].ready ? "✓ Fertig (Ändern)" : "⏳ Ich bin fertig";
-                        rBtn.className = `text-xs px-3 py-1 rounded font-semibold text-white ${d.members[activeUser].ready ? 'bg-emerald-600' : 'bg-teal-700'}`;
-                    } else { rBtn.classList.add('hidden'); }
+                        rBtn.classList.remove('hidden'); rBtn.innerText = d.members[activeUser].ready ? "✓ Freigegeben" : "📋 Eingetragen";
+                        rBtn.className = `text-xs px-3 py-1 rounded font-semibold text-white ${d.members[activeUser].ready?'bg-emerald-600':'bg-teal-700'}`;
+                    } else rBtn.classList.add('hidden');
 
                     let pSel = document.getElementById('expensePayer'), prevP = pSel.value || activeUser;
                     pSel.innerHTML = '<option value="">Wer hat gezahlt?</option>' + aes.map(([m]) => `<option value="${m}">${m}</option>`).join('');
                     pSel.value = prevP || activeUser;
 
-                    if (parseInt(document.getElementById('editIndex').value) === -1) {
-                        renderCheckboxes();
-                        document.getElementById('expenseDate').value = getTodayIso();
-                    }
+                    if (parseInt(document.getElementById('editIndex').value) === -1) { renderCheckboxes(); document.getElementById('expenseDate').value = getTodayIso(); }
 
                     const renderExps = (list, isMy = false) => list.length === 0 ? '<p class="text-xs text-gray-400">Keine.</p>' : list.map(e => {
-                        let dateFormatted = e.date ? ` <span class="text-[10px] text-gray-400">(${formatDateGerman(e.date)})</span>` : '';
-                        return `<div class="flex justify-between items-center bg-gray-50 p-2.5 rounded text-xs border"><div>${!isMy ? `<span class="font-bold" style="color:${getUsernameColor(e.payer)}">${e.payer}</span> zahlte ` : ''}<span class="font-semibold">${e.amount.toFixed(2)} €</span> für <i>"${e.desc}"</i>${dateFormatted}</div>${!arch ? `<div class="flex gap-1"><button onclick="editExpense(${e.i})" class="bg-teal-100 px-2 py-1 rounded">Edit</button><button onclick="deleteExpense(${e.i})" class="bg-red-100 px-2 py-1 rounded">X</button></div>` : ''}</div>`;
+                        let canEdit = (e.payer === activeUser || isAdmin);
+                        return `<div class="flex justify-between items-center bg-gray-50 p-2.5 rounded text-xs border"><div>${!isMy?`<span class="font-bold" style="color:${getUsernameColor(e.payer)}">${e.payer}</span> zahlte `:''}<span class="font-semibold">${e.amount.toFixed(2)} €</span> für <i>"${e.desc}"</i></div>${(!arch && canEdit)?`<div class="flex gap-1"><button onclick="editExpense(${e.i})" class="bg-teal-100 px-2 py-1 rounded">Edit</button><button onclick="deleteExpense(${e.i})" class="bg-red-100 px-2 py-1 rounded">X</button></div>`:''}</div>`;
                     }).join('');
 
                     document.getElementById('expenseList').innerHTML = renderExps(d.expenses.map((e, i) => ({ ...e, i })));
@@ -806,16 +885,40 @@
             }
 
             document.getElementById('currentUserDisplay').innerText = activeUser || 'Wählen...';
+            document.getElementById('currentUserDisplayTrip').innerText = activeUser || 'Wählen...';
+            document.getElementById('currentUserDisplayMoney').innerText = activeUser || 'Wählen...';
             let gmFinal = appData.meta.globalMembers || {};
-            if (Object.keys(gmFinal).length > 0 && (!activeUser || !gmFinal[activeUser])) openUserModalManual();
-            else if (Object.keys(gmFinal).length === 0) openUserModalManual();
+            if (Object.keys(gmFinal).length > 0 && (!activeUser || !gmFinal[activeUser])) openUserModal();
+            else if (Object.keys(gmFinal).length === 0) openUserModal();
         }
 
-        function checkEverythingSettled(ae, exps) { let b = {}; ae.forEach(([n]) => b[n] = 0); exps.forEach(e => { if (b[e.payer] !== undefined) b[e.payer] += e.amount; let s = e.amount / e.participants.length; e.participants.forEach(p => { if (b[p] !== undefined) b[p] -= s; }); }); return Object.values(b).every(v => Math.abs(v) < 0.01); }
+        function checkEverythingSettled(ae, exps) {
+            let b = {}; ae.forEach(([n]) => b[n] = 0);
+            exps.forEach(e => { if (b[e.payer] !== undefined) b[e.payer] += e.amount; let s = e.amount / e.participants.length; e.participants.forEach(p => { if (b[p] !== undefined) b[p] -= s; }); });
+            return Object.values(b).every(v => Math.abs(v) < 0.01);
+        }
 
         function calculate(allR, aes, exps, arch) {
             let b = {}, amn = aes.map(([n]) => n); amn.forEach(m => b[m] = 0);
-            exps.forEach(e => { if (b[e.payer] !== undefined) b[e.payer] += e.amount; let s = e.amount / e.participants.length; e.participants.forEach(p => { if (b[p] !== undefined) b[p] -= s; }); });
+            
+            exps.forEach(e => { 
+                if (b[e.payer] !== undefined) b[e.payer] += e.amount; 
+                let exactShare = e.amount / e.participants.length;
+                let sharePerPerson = Math.ceil(exactShare * 100) / 100;
+                
+                let distributed = 0;
+                e.participants.forEach((p, idx) => { 
+                    if (b[p] !== undefined) {
+                        if (idx === e.participants.length - 1) {
+                            let remainder = Math.round((e.amount - distributed) * 100) / 100;
+                            b[p] -= remainder;
+                        } else {
+                            b[p] -= sharePerPerson;
+                            distributed += sharePerPerson;
+                        }
+                    } 
+                }); 
+            });
 
             let pb = document.getElementById('personalBalanceBox');
             if (activeUser && b[activeUser] !== undefined) {
@@ -823,34 +926,29 @@
                 pb.innerHTML = `👋 <b style="color:${getUsernameColor(activeUser)}">${activeUser}</b>: ${val > 0.01 ? `<span class="text-emerald-700 font-bold">+${abs} €</span>` : val < -0.01 ? `<span class="text-rose-700 font-bold">-${abs} €</span>` : `<b>0,00 €</b>`}`;
             }
 
-            document.getElementById('balanceBarList').innerHTML = Object.entries(b).map(([n, val]) => `<div class="flex justify-between text-xs bg-white p-2 rounded border"><span class="font-semibold" style="color:${getUsernameColor(n)}">${n}</span><span class="px-2 rounded border ${val >= 0 ? 'text-emerald-700 bg-emerald-100' : 'text-rose-700 bg-rose-100'}">${val >= 0 ? '+' : ''}${val.toFixed(2)} €</span></div>`).join('');
+            document.getElementById('balanceBarList').innerHTML = Object.entries(b).map(([n, val]) => `<div class="flex justify-between text-xs bg-white p-2 rounded border"><span class="font-semibold" style="color:${getUsernameColor(n)}">${n}</span><span class="px-2 rounded border ${val>=0?'text-emerald-700 bg-emerald-100':'text-rose-700 bg-rose-100'}">${val>=0?'+':''}${val.toFixed(2)} €</span></div>`).join('');
 
             let debtors = [], creditors = [];
-            for (let m in b) { if (b[m] < -0.01) debtors.push({ name: m, amount: -b[m] }); else if (b[m] > 0.01) creditors.push({ name: m, amount: b[m] }); }
-            debtors.sort((a, b) => b.amount - a.amount); creditors.sort((a, b) => b.amount - a.amount);
+            for (let m in b) { 
+                let roundedVal = Math.round(b[m] * 100) / 100;
+                if (roundedVal < -0.01) debtors.push({ name: m, amount: -roundedVal }); 
+                else if (roundedVal > 0.01) creditors.push({ name: m, amount: roundedVal }); 
+            }
+            debtors.sort((a,b)=>b.amount-a.amount); creditors.sort((a,b)=>b.amount-a.amount);
 
             let tx = [], i = 0, j = 0;
             while (i < debtors.length && j < creditors.length) {
-                let d = debtors[i], c = creditors[j], amt = Math.min(d.amount, c.amount), pp = aes.find(([name]) => name === c.name)?.[1]?.paypal || '';
+                let d = debtors[i], c = creditors[j], amt = Math.min(d.amount, c.amount);
+                amt = Math.round(amt * 100) / 100;
+                let btnClass = allR ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed';
+                let actionBtn = !arch ? `<div class="flex gap-1"><button onclick="${allR?`settleDebt('${d.name}','${c.name}',${amt},${allR})`:``}" class="${btnClass} text-[10px] px-2 py-1 rounded font-bold shadow">✅ Beglichen</button></div>` : '<span class="text-[10px] text-gray-400">Erledigt</span>';
                 
-                let actionBtnHtml = '';
-                if (!arch) {
-                    let btnClass = allR ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed';
-                    let clickAction = allR ? `settleDebt('${d.name}','${c.name}',${amt},${allR})` : `alert("🔒 Erst müssen alle Mitglieder oben auf 'Fertig ✓' klicken!")`;
-                    
-                    actionBtnHtml = `
-                        <div class="flex gap-1">
-                            ${pp ? `<button onclick="window.open('https://${pp.replace(/^https?:\/\//i, '')}/${amt.toFixed(2)}EUR','_blank')" class="bg-teal-700 text-white text-[10px] px-2 py-1 rounded font-bold">🅿️ PayPal</button>` : ''}
-                            <button onclick="${clickAction}" class="${btnClass} text-[10px] px-2 py-1 rounded font-bold shadow">✅ Beglichen</button>
-                        </div>
-                    `;
-                } else {
-                    actionBtnHtml = '<span class="text-[10px] text-gray-400">Erledigt</span>';
-                }
-
-                tx.push(`<div class="flex justify-between items-center bg-white p-2.5 rounded border border-teal-200 text-xs gap-2"><span class="truncate">👉 <b style="color:${getUsernameColor(d.name)}">${d.name}</b> zahlt <b>${amt.toFixed(2)} €</b> an <b style="color:${getUsernameColor(c.name)}">${c.name}</b></span><div class="shrink-0">${actionBtnHtml}</div></div>`);
+                tx.push(`<div class="flex justify-between items-center bg-white p-2.5 rounded border border-teal-200 text-xs gap-2"><span class="truncate">👉 <b style="color:${getUsernameColor(d.name)}">${d.name}</b> zahlt <b>${amt.toFixed(2)} €</b> an <b style="color:${getUsernameColor(c.name)}">${c.name}</b></span><div class="shrink-0">${actionBtn}</div></div>`);
                 
-                d.amount -= amt; c.amount -= amt; if (d.amount < 0.01) i++; if (c.amount < 0.01) j++;
+                d.amount = Math.round((d.amount - amt) * 100) / 100;
+                c.amount = Math.round((c.amount - amt) * 100) / 100;
+                if (d.amount < 0.01) i++; 
+                if (c.amount < 0.01) j++;
             }
             document.getElementById('settlementList').innerHTML = tx.length === 0 ? '<p class="text-xs text-emerald-700 font-medium">✨ Alles ausgeglichen!</p>' : tx.join('');
         }
