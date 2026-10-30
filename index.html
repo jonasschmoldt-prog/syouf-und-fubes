@@ -51,19 +51,16 @@
     <div class="max-w-md mx-auto p-4 sm:p-6 my-6 bg-white rounded-2xl shadow-lg border border-gray-200">
         <!-- Dashboard View -->
         <div id="viewDashboard" class="space-y-4">
-            <!-- App-Name links & Benutzer-Button (User) ganz oben rechts -->
             <div class="flex justify-between items-center mb-2">
                 <h1 class="text-lg font-extrabold text-teal-900 tracking-wide">Syouf und Fubes</h1>
                 <button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200 shadow-sm">👤 <span id="currentUserDisplay">Wählen...</span></button>
             </div>
 
-            <!-- Datum-Stand & Aktualisieren-Button darunter getauscht -->
             <div class="flex justify-between items-center mb-2 px-1">
                 <span class="text-xs text-gray-500 font-medium" id="currentDateDisplay">Daten-Stand</span>
                 <button onclick="location.reload()" class="bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 px-3 py-1.5 text-xs font-bold rounded-xl shadow-sm flex items-center gap-1">🔄 Aktualisieren</button>
             </div>
 
-            <!-- Dashboard Mitglieder-Bereich -->
             <div class="p-4 bg-gray-50 rounded-xl border space-y-3">
                 <h2 class="text-xs font-bold text-gray-700 uppercase">👥 Mitglieder</h2>
                 <div class="space-y-2">
@@ -101,6 +98,7 @@
                 <button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200">👤 <span id="currentUserDisplayTrip">Wählen...</span></button>
             </div>
 
+            <!-- Zentrierte Überschrift -->
             <div class="bg-teal-900 text-white p-3 rounded-xl text-center">
                 <span id="tripHeaderSub" class="text-[10px] uppercase text-teal-300 block">Zentrale</span>
                 <h2 id="tripDashboardTitle" class="text-sm font-bold">Name</h2>
@@ -195,8 +193,21 @@
                     </div>
                 </div>
 
+                <!-- An- und Abfahrt Sektion -->
                 <div id="previewContent-travel" class="space-y-4 hidden">
-                    <div class="p-4 bg-teal-50/50 rounded-xl border space-y-2"><h3 class="text-xs font-bold uppercase">🚗 Ab- und Anfahrt</h3><div id="arrivalList" class="space-y-1.5 text-xs bg-white p-2.5 rounded border min-h-[40px]"></div><div class="flex gap-1 pt-1"><input type="text" id="arrivalInput" placeholder="Anfahrt-Details..." class="flex-1 p-2 text-xs border rounded"><button onclick="saveArrival()" class="bg-teal-700 text-white px-3 py-1 text-xs rounded">Eintragen</button></div></div>
+                    <div class="p-4 bg-teal-50/50 rounded-xl border space-y-3">
+                        <h3 class="text-xs font-bold uppercase">🚗 Ab- und Anfahrt</h3>
+                        <div id="arrivalList" class="space-y-2 text-xs bg-white p-2.5 rounded border min-h-[40px]"></div>
+                        
+                        <div class="border-t pt-3 space-y-2">
+                            <input type="hidden" id="editArrivalIndex" value="-1">
+                            <input type="text" id="arrivalInput" placeholder="Neue An-/Abfahrt Details (z.B. Zug um 14 Uhr)..." class="w-full p-2 text-xs border rounded bg-white">
+                            <div class="flex gap-2">
+                                <button id="saveArrivalBtn" onclick="saveArrival()" class="flex-1 bg-teal-700 text-white py-2 text-xs font-bold rounded shadow">Eintrag hinzufügen</button>
+                                <button id="cancelArrivalEditBtn" onclick="resetArrivalForm()" class="hidden bg-gray-200 text-gray-700 px-3 py-2 text-xs rounded">Abbrechen</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -208,6 +219,7 @@
                 <button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200">👤 <span id="currentUserDisplayMoney">Wählen...</span></button>
             </div>
 
+            <!-- Zentrierte Überschrift -->
             <div id="moneyHeaderBox" class="bg-teal-900 text-white p-3 rounded-xl text-center">
                 <span class="text-[10px] uppercase text-teal-300 block">Money Split</span>
                 <h2 id="activeTripTitle" class="text-sm font-bold">Rubrik</h2>
@@ -289,14 +301,30 @@
         const isArchived = (d, ae) => d.expenses.length > 0 && ae.length > 0 && ae.every(([_, m]) => m.ready) && checkEverythingSettled(ae, d.expenses);
 
         async function init() {
-            // Exaktes aktuelles Datum anzeigen (z.B. "Daten-Stand • 30.10.2026")
             let now = new Date();
             let dateStr = `${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()}`;
             document.getElementById('currentDateDisplay').innerText = `Daten-Stand • ${dateStr}`;
 
             try {
                 const { data } = await sb.from('split_data').select('*').eq('id', 'main_store').single();
-                if (data?.data) { appData = data.data; if (!appData.meta) appData.meta = { planner: null, lotteryPool: [], globalMembers: {} }; if (!appData.meta.globalMembers) appData.meta.globalMembers = {}; }
+                if (data?.data) { 
+                    appData = data.data; 
+                    if (!appData.meta) appData.meta = { planner: null, lotteryPool: [], globalMembers: {} }; 
+                    if (!appData.meta.globalMembers) appData.meta.globalMembers = {}; 
+                    
+                    // Migration für ältere Trips, falls arrivals noch ein Objekt/String war
+                    for (let ev in appData) {
+                        if (ev !== 'meta' && appData[ev].arrivals && !Array.isArray(appData[ev].arrivals)) {
+                            let oldArr = appData[ev].arrivals;
+                            appData[ev].arrivals = [];
+                            for (let u in oldArr) {
+                                if (typeof oldArr[u] === 'string' && oldArr[u].trim()) {
+                                    appData[ev].arrivals.push({ user: u, text: oldArr[u] });
+                                }
+                            }
+                        }
+                    }
+                }
                 else { await sb.from('split_data').upsert({ id: 'main_store', data: appData }); }
             } catch (e) { alert("⚠️ Fehler beim Laden."); }
             
@@ -326,7 +354,7 @@
                 map[activeUser][n].lastAccCount = (d.accommodations || []).length + (d.checklist || []).length;
             }
             if (tab === 'all' || tab === 'travel') {
-                map[activeUser][n].lastTravelCount = Object.keys(d.arrivals || {}).length;
+                map[activeUser][n].lastTravelCount = (d.arrivals || []).length;
             }
             if (tab === 'all' || tab === 'money') {
                 map[activeUser][n].lastMoneyCount = (d.expenses || []).length;
@@ -349,7 +377,7 @@
                 return Math.max(0, current - (uData.lastAccCount || 0));
             }
             if (tab === 'travel') {
-                let current = Object.keys(d.arrivals || {}).length;
+                let current = (d.arrivals || []).length;
                 return Math.max(0, current - (uData.lastTravelCount || 0));
             }
             if (tab === 'money') {
@@ -359,7 +387,7 @@
             if (tab === 'total') {
                 let inf = (d.infos ? 1 : 0) + (d.polls || []).length - (uData.lastInfosCount || 0);
                 let acc = (d.accommodations || []).length + (d.checklist || []).length - (uData.lastAccCount || 0);
-                let trv = Object.keys(d.arrivals || {}).length - (uData.lastTravelCount || 0);
+                let trv = (d.arrivals || []).length - (uData.lastTravelCount || 0);
                 let mon = (d.expenses || []).length - (uData.lastMoneyCount || 0);
                 return Math.max(0, inf) + Math.max(0, acc) + Math.max(0, trv) + Math.max(0, mon);
             }
@@ -449,10 +477,54 @@
             selectUser(n); await save(); renderUI();
         }
 
+        // An- und Abfahrt Logik (Als Liste mit Bearbeiten & Löschen)
         async function saveArrival() {
-            let t = document.getElementById('arrivalInput').value.trim(); if (!t || !activeUser) return alert('Text & Name wählen.');
-            appData[curEvent].arrivals = appData[curEvent].arrivals || {};
-            appData[curEvent].arrivals[activeUser] = t; document.getElementById('arrivalInput').value = ''; await save(); renderUI();
+            let t = document.getElementById('arrivalInput').value.trim(); 
+            if (!t || !activeUser) return alert('Text & Name wählen.');
+            
+            appData[curEvent].arrivals = appData[curEvent].arrivals || [];
+            let editIdx = parseInt(document.getElementById('editArrivalIndex').value);
+
+            if (editIdx === -1) {
+                appData[curEvent].arrivals.push({ user: activeUser, text: t });
+            } else {
+                // Nur eigener Eintrag oder Admin darf bearbeiten
+                let item = appData[curEvent].arrivals[editIdx];
+                if (item && (item.user === activeUser || isUserAdmin(curEvent))) {
+                    appData[curEvent].arrivals[editIdx].text = t;
+                } else {
+                    return alert('🔒 Nur eigene Einträge bearbeitbar!');
+                }
+            }
+
+            resetArrivalForm();
+            await save(); 
+            renderUI();
+        }
+
+        function editArrival(index, text, user) {
+            if (user !== activeUser && !isUserAdmin(curEvent)) return alert('🔒 Nur eigene Einträge bearbeitbar!');
+            document.getElementById('arrivalInput').value = text;
+            document.getElementById('editArrivalIndex').value = index;
+            document.getElementById('saveArrivalBtn').innerText = 'Eintrag speichern';
+            document.getElementById('cancelArrivalEditBtn').classList.remove('hidden');
+        }
+
+        function resetArrivalForm() {
+            document.getElementById('arrivalInput').value = '';
+            document.getElementById('editArrivalIndex').value = '-1';
+            document.getElementById('saveArrivalBtn').innerText = 'Eintrag hinzufügen';
+            document.getElementById('cancelArrivalEditBtn').classList.add('hidden');
+        }
+
+        async function deleteArrival(index, user) {
+            if (user !== activeUser && !isUserAdmin(curEvent)) return alert('🔒 Nur eigene Einträge löschbar!');
+            if (confirm('Diesen Eintrag wirklich löschen?')) {
+                appData[curEvent].arrivals.splice(index, 1);
+                resetArrivalForm();
+                await save();
+                renderUI();
+            }
         }
 
         function openLotteryModal() {
@@ -513,7 +585,7 @@
             }
 
             let tm = {}; for (let m in appData.meta.globalMembers) tm[m] = { ready: false, active: true, paypal: '' };
-            appData[tripName] = { createdAt: Date.now(), planner: w, admins: [], pollDates: "", infos: "", accommodations: [], checklist: [], polls: [], arrivals: {}, members: tm, expenses: [] };
+            appData[tripName] = { createdAt: Date.now(), planner: w, admins: [], pollDates: "", infos: "", accommodations: [], checklist: [], polls: [], arrivals: [], members: tm, expenses: [] };
             await save(); 
             toggleModal('lotteryModal', false); 
             openTripDashboard(tripName);
@@ -535,7 +607,7 @@
         async function createManualTrip() {
             let tripName = document.getElementById('manualTripNameInput').value.trim(); if (!tripName) return alert('Namen eingeben!'); if (appData[tripName]) return alert('Existiert bereits!');
             let tm = {}; for (let m in appData.meta.globalMembers) tm[m] = { ready: false, active: true, paypal: '' };
-            appData[tripName] = { createdAt: Date.now(), planner: activeUser, admins: Array.from(document.querySelectorAll('.manual-admin-cb:checked')).map(cb => cb.value), pollDates: document.getElementById('manualTripDatesInput').value.trim(), infos: "", accommodations: [], checklist: [], polls: [], arrivals: {}, members: tm, expenses: [] };
+            appData[tripName] = { createdAt: Date.now(), planner: activeUser, admins: Array.from(document.querySelectorAll('.manual-admin-cb:checked')).map(cb => cb.value), pollDates: document.getElementById('manualTripDatesInput').value.trim(), infos: "", accommodations: [], checklist: [], polls: [], arrivals: [], members: tm, expenses: [] };
             await save(); toggleModal('manualTripModal', false); openTripDashboard(tripName);
         }
 
@@ -827,7 +899,15 @@
                     document.getElementById('adminParticipantControls').classList.toggle('hidden', !(isAdmin && !arch));
                     document.getElementById('mainRoleTabContainer').classList.toggle('hidden', !isAdmin || arch);
 
-                    document.getElementById('arrivalList').innerHTML = Object.keys(d.arrivals || {}).length === 0 ? '<span class="text-gray-400 italic">Keine.</span>' : Object.entries(d.arrivals).map(([u, t]) => `<div>🚗 <span style="color:${getUsernameColor(u)};font-weight:bold">${u}:</span> ${t}</div>`).join('');
+                    // An- und Abfahrt rendern mit Edit/Delete Buttons
+                    let arrs = d.arrivals || [];
+                    document.getElementById('arrivalList').innerHTML = arrs.length === 0 ? '<span class="text-gray-400 italic">Noch keine An- oder Abfahrten eingetragen.</span>' : arrs.map((item, idx) => {
+                        let canEdit = (item.user === activeUser || isAdmin);
+                        return `<div class="flex justify-between items-center bg-gray-50 p-2 rounded border gap-2">
+                            <div class="text-xs">🚗 <span style="color:${getUsernameColor(item.user)};font-weight:bold">${item.user}:</span> ${item.text}</div>
+                            ${canEdit ? `<div class="flex gap-1 shrink-0"><button onclick="editArrival(${idx}, '${item.text.replace(/'/g, "\\'")}', '${item.user}')" class="bg-teal-100 hover:bg-teal-200 text-teal-900 px-2 py-0.5 rounded text-[10px] font-bold">Edit</button><button onclick="deleteArrival(${idx}, '${item.user}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-0.5 rounded text-[10px] font-bold">✕</button></div>` : ''}
+                        </div>`;
+                    }).join('');
 
                     let mUnread = getUnread(curEvent, 'money');
                     let moneyBadgeContainer = document.getElementById('moneySplitBadgeContainer');
@@ -874,7 +954,7 @@
 
                     const renderExps = (list, isMy = false) => list.length === 0 ? '<p class="text-xs text-gray-400">Keine.</p>' : list.map(e => {
                         let canEdit = (e.payer === activeUser || isAdmin);
-                        return `<div class="flex justify-between items-center bg-gray-50 p-2.5 rounded text-xs border"><div>${!isMy?`<span class="font-bold" style="color:${getUsernameColor(e.payer)}">${e.payer}</span> zahlte `:''}<span class="font-semibold">${e.amount.toFixed(2)} €</span> für <i>"${e.desc}"</i></div>${(!arch && canEdit)?`<div class="flex gap-1"><button onclick="editExpense(${e.i})" class="bg-teal-100 px-2 py-1 rounded">Edit</button><button onclick="deleteExpense(${e.i})" class="bg-red-100 px-2 py-1 rounded">X</button></div>`:''}</div>`;
+                        return `<div class="flex justify-between items-center bg-gray-50 p-2.5 rounded text-xs border"><div>${!isMy?`<span class="font-bold" style="color:${getUsernameColor(e.payer)}">${e.payer}</span> zahlte `:''}<span class="font-semibold">${e.amount.toFixed(2)} €</span> for <i>"${e.desc}"</i></div>${(!arch && canEdit)?`<div class="flex gap-1"><button onclick="editExpense(${e.i})" class="bg-teal-100 px-2 py-1 rounded">Edit</button><button onclick="deleteExpense(${e.i})" class="bg-red-100 px-2 py-1 rounded">X</button></div>`:''}</div>`;
                     }).join('');
 
                     document.getElementById('expenseList').innerHTML = renderExps(d.expenses.map((e, i) => ({ ...e, i })));
