@@ -76,7 +76,14 @@
 
         <!-- Trip Dashboard View -->
         <div id="viewTripDashboard" class="space-y-4 hidden">
-            <div class="flex justify-between items-center"><button onclick="goToDashboard()" class="text-sm font-bold text-teal-900 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 shadow-sm">🏠 Home</button><button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200">👤 <span id="currentUserDisplayTrip">Wählen...</span></button></div>
+            <div class="flex justify-between items-center">
+                <button onclick="goToDashboard()" class="text-sm font-bold text-teal-900 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 shadow-sm">🏠 Home</button>
+                <button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200">👤 <span id="currentUserDisplayTrip">Wählen...</span></button>
+            </div>
+            <div class="flex justify-end px-1">
+                <button onclick="location.reload()" class="bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 px-3 py-1.5 text-xs font-bold rounded-xl shadow-sm">🔄 Aktualisieren</button>
+            </div>
+
             <div class="bg-teal-900 text-white p-3 rounded-xl text-center"><span id="tripHeaderSub" class="text-[10px] uppercase text-teal-300 block">Zentrale</span><h2 id="tripDashboardTitle" class="text-sm font-bold">Name</h2></div>
             <div class="bg-teal-50/50 rounded-xl border overflow-hidden">
                 <button type="button" onclick="toggleParticipantsDropdown()" class="w-full px-4 py-2.5 text-xs font-bold text-teal-900 bg-teal-50 flex justify-between items-center"><span>👥 Teilnehmer (<span id="participantCountLabel">0</span>)</span><span id="participantsArrow">▼</span></button>
@@ -161,7 +168,14 @@
 
         <!-- Split Money View -->
         <div id="viewSplitMoney" class="space-y-4 hidden">
-            <div class="flex justify-between items-center"><button onclick="goToDashboard()" class="text-sm font-bold text-teal-900 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 shadow-sm">🏠 Home</button><button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200">👤 <span id="currentUserDisplayMoney">Wählen...</span></button></div>
+            <div class="flex justify-between items-center">
+                <button onclick="goToDashboard()" class="text-sm font-bold text-teal-900 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 shadow-sm">🏠 Home</button>
+                <button onclick="openUserModal()" class="text-xs bg-teal-50 text-teal-900 px-3 py-1.5 rounded-full font-medium border border-teal-200">👤 <span id="currentUserDisplayMoney">Wählen...</span></button>
+            </div>
+            <div class="flex justify-end px-1">
+                <button onclick="location.reload()" class="bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200 px-3 py-1.5 text-xs font-bold rounded-xl shadow-sm">🔄 Aktualisieren</button>
+            </div>
+
             <div class="bg-teal-900 text-white p-3 rounded-xl text-center"><span class="text-[10px] uppercase text-teal-300 block">Money Split</span><h2 id="activeTripTitle" class="text-sm font-bold">Rubrik</h2></div>
             <div><button onclick="openTripDashboard(curEvent)" class="w-full bg-teal-800 text-white py-2 text-xs font-bold rounded-xl shadow border border-teal-700">🔙 Zur Zentrale</button></div>
             
@@ -314,15 +328,8 @@
             if ((t === 'all' || t === 'mine') && curEvent && activeUser) { markSeen(curEvent, 'money'); renderUI(); }
         }
 
-        function toggleParticipantsDropdown() {
-            let box = document.getElementById('participantsDropdownContent');
-            box.classList.toggle('hidden');
-        }
-
-        function toggleMoneyParticipantsDropdown() {
-            let box = document.getElementById('moneyParticipantsDropdownContent');
-            box.classList.toggle('hidden');
-        }
+        function toggleParticipantsDropdown() { document.getElementById('participantsDropdownContent').classList.toggle('hidden'); }
+        function toggleMoneyParticipantsDropdown() { document.getElementById('moneyParticipantsDropdownContent').classList.toggle('hidden'); }
 
         async function addGlobalMember() {
             let n = document.getElementById('globalMemberName').value.trim(); if (!n) return;
@@ -582,6 +589,7 @@
 
         async function settleDebt(from, to, amount, allowed) {
             if (!allowed) return alert("🔒 Warten, bis alle Mitglieder bereit sind!");
+            if (from !== activeUser) return alert("🔒 Du kannst nur deine eigenen Ausgleiche begleichen!");
             if (confirm(`Ausgleich von ${from} an ${to} (${amount.toFixed(2)} €)?`)) {
                 appData[curEvent].expenses.push({ desc: `💸 Ausgleich: ${from} an ${to}`, amount, date: getTodayIso(), payer: from, participants: [to], createdBy: activeUser || 'Unbekannt' });
                 await save(); renderUI();
@@ -772,8 +780,9 @@
             let tx = [], i = 0, j = 0;
             while (i < debtors.length && j < creditors.length) {
                 let d = debtors[i], c = creditors[j], amt = Math.round(Math.min(d.amount, c.amount) * 100) / 100;
-                let btnClass = allR ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed';
-                let actionBtn = !arch ? `<button onclick="${allR?`settleDebt('${d.name}','${c.name}',${amt},${allR})`:``}" class="${btnClass} text-[10px] px-2 py-1 rounded font-bold shadow">✅ Beglichen</button>` : '<span class="text-[10px] text-gray-400">Erledigt</span>';
+                let isMyDebt = (d.name === activeUser);
+                let btnClass = (allR && isMyDebt) ? 'bg-emerald-600 text-white cursor-pointer hover:bg-emerald-500' : 'bg-gray-200 text-gray-400 cursor-not-allowed';
+                let actionBtn = !arch ? `<button onclick="${(allR && isMyDebt)?`settleDebt('${d.name}','${c.name}',${amt},${allR})`:''}" class="${btnClass} text-[10px] px-2 py-1 rounded font-bold shadow">✅ Beglichen</button>` : '<span class="text-[10px] text-gray-400">Erledigt</span>';
                 tx.push(`<div class="flex justify-between items-center bg-white p-2.5 rounded border border-teal-200 text-xs gap-2"><span class="truncate">👉 <b style="color:${getUsernameColor(d.name)}">${d.name}</b> zahlt <b>${amt.toFixed(2)} €</b> an <b style="color:${getUsernameColor(c.name)}">${c.name}</b></span><div class="shrink-0">${actionBtn}</div></div>`);
                 d.amount = Math.round((d.amount - amt) * 100) / 100; c.amount = Math.round((c.amount - amt) * 100) / 100;
                 if (d.amount < 0.01) i++; if (c.amount < 0.01) j++;
